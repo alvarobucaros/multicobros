@@ -1,0 +1,25 @@
+bootstrap detalles:  
+https://getbootstrap.com/docs/5.0/forms/overview/
+
+How to Correctly Use Bootstrap 5 in Next.js
+https://www.kindacode.com/article/how-to-correctly-use-bootstrap-5-in-next-js/
+
+next.org
+https://nextjs.org/learn/foundations/about-nextjs
+https://es.reactjs.org/docs/conditional-rendering.html
+
+pasa de hijo a padre y de padre a hijo
+https://www.geeksforgeeks.org/how-to-pass-data-from-one-component-to-other-component-in-reactjs/
+
+https://stackoverflow.com/questions/43862600/how-can-i-get-query-string-parameters-from-the-url-in-next-js
+
+https://vpilip.com/how-build-simple-pagination-in-nextjs/
+
+para correo
+https://dev.to/kennymark/how-to-send-serverless-emails-with-next-js-and-sengrid-40lj
+
+//https://bytearcher.com/articles/how-to-delete-value-from-array/
+
+Ejemplo de check
+https://cheatcode.co/tutorials/how-to-build-a-select-all-list-component-in-react-with-next-js
+
