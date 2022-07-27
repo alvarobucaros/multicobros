@@ -9,11 +9,11 @@ function CobrosForm(props) {
     const empresa = props.e;
     const usuario = props.u;
     const nivel = props.n;
+
     var   [misDatos] = [{}];
     const[listo, setListo] = useState(false)
-
-    const [startDate, setStartDate] = useState(new Date());
-    const [opcion, setOpcion] = useState('')
+    const [swtGrupo, setSwtGrupo] = useState(false)
+    const [swtProcesa, setSwtProcesa] = useState(false)
     const [aviso, setAviso] =useState();
     const [nota1, setNota1] =useState('');
     const [nota2, setNota2] =useState('');
@@ -32,21 +32,32 @@ function CobrosForm(props) {
       cp_aplica:'T' 
   }) 
   
-  const [conceptosW, setConceptosW]  = useState({ 
-    id:0, cp_idEmpresa:empresa, cp_titulo:'', cp_descripcion:'',  cp_fechaDesde:'', 
-    cp_fechaHasta:'', cp_valorCobro:'', cp_valorCuota:'', cp_estado:'', cp_aplica:''}) 
+ const[ctaXcobrar, setCtaXcobrar] = useState({
+  id:0, 
+  cc_idEmpresa:empresa ,
+  cc_idConcepto:0 ,
+  cc_idGrupo:0 ,
+  cc_fechaProceso: new Date(),
+  cc_valor:0,
+  cc_saldo:0,
+  cc_activa:''
+ })
+
+
 
     const [cpto, setCpto] = useState([])
     const [notas, setNotas] = useState('')
-
+    const [grpo, setGrpo] = useState([])
+    var grupoId = 0;
+    var conceptoId = 0
 
     useEffect(()=>{
-        traeComboPpal(empresa)
+        traeComboPpal(empresa);
+        traeGrupos(empresa);
     },[])
       
     async function traeComboPpal(empresa){ 
       let id = empresa;       
-       
       await  axios.post('http://localhost:3000/api/conceptos/'+id)
       .then(res=>{
           misDatos=res.data;               
@@ -62,18 +73,20 @@ function CobrosForm(props) {
       })
     }
 
-async function traeCpto(id)
+async function traeGrupos(id)
   {
-    const res =await  axios.post('http://localhost:3000/api/conceptos/'+id)
+    await  axios.get('http://localhost:3000/api/grupos/'+id)
     .then(res=>{
-      misDatos=res.data;       
-    });
-      setConceptosW(misDatos[0]);
-
-      if(conceptosW.cp_aplica === 'G'){
-        traeGrupos;
-      }
-      setListo(true)
+        misDatos=res.data; 
+        setGrpo(misDatos.map(dat => {
+          let properties = {
+            "id": dat.id,
+            "grp_nombre": dat.grp_nombre,
+            "grp_detalle":dat.grp_detalle
+          };
+          return properties;
+          }));      
+    })
   }
 
       const ActualizaRegistro= async (e) => {
@@ -90,42 +103,61 @@ async function traeCpto(id)
           }
           return fch;
       }
-    
-
-      async function traeGrupos() {
-        console.log('trae grupos + ' + empresa)
-      }
-      
-      const handledChange = ({target: {name, value}}) => {
-        setConceptos({...conceptos, [name]: value});
-      }
       
       const handledSubmit = async (e) => {
         e.preventDefault();
       }
 
-      async function handleSelectChange(e) {
+      async function handleSelectChangeCpto(e) {
         let id = e.target.value;
+        setCtaXcobrar.cc_idConcepto= id;
+        setCtaXcobrar.cc_idGrupo= 0;
         conceptos.forEach(object =>{
-        if(object.id == id){ 
-          let aplica = "Aplica para todos";
-          if(object.cp_aplica == 'G'){aplica = "Aplica solo a un grupo"}
-          setNota1(object.cp_titulo+ " " + object.cp_descripcion+ '  (' +aplica+ ')');
-          setNota2('Valor Deuda $'+ object.cp_valorCobro.toLocaleString("en-US", {style:"currency", currency:"USD"}) + " Valor cuota $"+ object.cp_valorCuota.toLocaleString("en-US", {style:"currency", currency:"EUR"}));
-          setNota3('Vigencia : del '+ object.cp_fechaDesde.toLocaleString("es-US") + " al "+ object.cp_fechaHasta);  
-          setListo(true);
-        }
+          if(object.id == id){ 
+            mostrarValores(object)
+          }
         })
+    }
+
+    async  function mostrarValores(object){
+      let aplica = "Aplica para todos";
+      setSwtGrupo(false)
+      setSwtProcesa(false)
+      grupoId=0;
+      if(object.cp_aplica == 'G'){
+        aplica = "Aplica solo a un grupo";
+        setSwtGrupo(true);
+      }else
+      {
+        setSwtProcesa(true)
+      }
+      setNotas(aplica)
+      setNota1(object.cp_titulo+ " " + object.cp_descripcion);
+      setNota2('Valor Deuda $'+ object.cp_valorCobro.toLocaleString("en-US", {style:"currency", currency:"USD"}) + " Valor cuota $"+ object.cp_valorCuota.toLocaleString("en-US", {style:"currency", currency:"EUR"}));
+      setNota3('Vigencia : del '+ object.cp_fechaDesde.split('T')[0] + " al "+ object.cp_fechaHasta.split('T')[0]);  
+      setListo(true);
+    }
+
+    const handleSelectChangeGrpo = (e) =>{
+      let id = e.target.value;
+      setCtaXcobrar.cc_idGrupo= id;
+     setSwtProcesa(true)
+      alert('Grupo : '+id);
+    }
+
+
+    const procesar = () => {
+alert ('Procesa el concepto :' + setCtaXcobrar.cc_idConcepto + ' con el grupo: '+setCtaXcobrar.cc_idGrupo)
     }
 
   return (
     <div className='container'>
       <form onSubmit={handledSubmit}>
           <div className="mb-1 row">
-              <label className="col-sm-3 col-form-label" htmlFor="cp_titulo">Concepto</label>
+              <label className="col-sm-1 col-form-label" htmlFor="cp_titulo">Concepto</label>
               <div className="col-sm-9">            
                 <select id='estado' name='estado' className='form-control'
-                  onChange={e => handleSelectChange(e)}
+                  onChange={e => handleSelectChangeCpto(e)}
                   defaultValue={conceptos.id} >
                     <option key={0} value={0}> Seleccione un concepto</option>
                     {cpto.map((cp)=>(
@@ -136,14 +168,37 @@ async function traeCpto(id)
               </div>
           </div>
         { listo ?
-          <div className='container'>
-            <div className="d-flex align-items-sm-center">
-              <span>{nota1} </span></div>
-            <div className="d-flex align-items-sm-center">
-            <span>{nota2} </span></div>
-            <div className="d-flex align-items-sm-center">
-            <span>{nota3} </span></div>      
-          </div>:''}
+        <div>
+            <div className='container'>
+              <div className="d-flex align-items-sm-center">
+                <span>{nota1} </span>  <strong className='strong'> ( {notas} )</strong></div>
+              <div className="d-flex align-items-sm-center">
+              <span>{nota2} </span></div>
+              <div className="d-flex align-items-sm-center">
+              <span>{nota3} </span></div>      
+            </div>
+            { swtGrupo ?
+            <div className="mb-1 row">
+            <label className="col-sm-1 col-form-label" htmlFor="cp_titulo">Grupo</label>
+              <div className="col-sm-9">            
+                <select id='grupo' name='grupo' className='form-control'
+                  onChange={e => handleSelectChangeGrpo(e)}
+                  defaultValue={grupoId} >
+                    <option key={0} value={0}> Seleccione un grupo</option>
+                    {grpo.map((cp)=>(
+                  <option key={cp.id} value={cp.id}> {cp.grp_nombre} - {cp.grp_detalle}</option>
+                  
+                  ))} 
+                </select> 
+              </div>
+              </div>
+            :''}
+          </div>          
+          :''}
+          {swtProcesa ?  
+            <div className="trc"><button onClick={() => procesar()} className='btn btn-sm btn-primary '>Procesa</button></div>
+            :''}
+
       </form>
     </div>
 

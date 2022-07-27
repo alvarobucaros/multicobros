@@ -26,6 +26,7 @@ export default async function handler(req, res) {
         let sql = "SELECT id, grp_empresa, grp_nombre, grp_detalle, grp_estado ";
         sql += " FROM grupos WHERE grp_empresa = ?" 
         sql += " ORDER BY grp_nombre ";
+console.log(sql)        
         const [result] = await pool.query(sql,id);
         return res.status(200).json(result);
       }

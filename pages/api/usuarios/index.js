@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {pool} from "../../../config/db";
 
+
 export default async function handler(req, res) {
  
   switch(req.method){
@@ -48,17 +49,19 @@ export default async function handler(req, res) {
   }
   
   const saveUsers = async (req, res) => {
-    const {us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel} = req.body;
+    const {id, us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email, us_codigo,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel} = req.body;
+    if (id === 0){ 
     const [result] = await pool.query("INSERT INTO usuarios SET ?",
-    {us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel})
-    return res.status(200).json({us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel, id: result.insertId });
-
+    {us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email, us_codigo,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel})
+    return res.status(200).json({us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email, us_codigo,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel, id: result.insertId });
+    }
+    else{
+      const [result] = await pool.query("UPDATE usuarios SET ? WHERE id = "+id,
+      {us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email, us_codigo,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel})     
+      return res.status(200).json({us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email, us_codigo,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel, id: result.insertId }); 
+    }
   }
  
   const updateUsers = async (req, res) => {
-    const {myname, description, price, createdat} = req.body;
-    const [result] = await pool.query("INSERT INTO product SET ?",
-                              {myname, description, price, createdat})
-    return res.status(200).json({myname, description, price, createdat, id: result.insertId });
-
+   
   }

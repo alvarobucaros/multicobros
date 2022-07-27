@@ -7,11 +7,12 @@ import "react-datepicker/dist/react-datepicker.css";
 function ConceptosForm(props) {
 
     var   [misDatos] = [{}];
-    const [registros, setRegistros] = useState([{}]);
-    const [numeroPaginas, setNumeroPaginas] = useState(0);
-    const registrosPorPagina = 6;
-    const [totalRegistros, setTotalRegistros] = useState(0);
+    const [numeroPaginas, setNumeroPaginas] = useState(0);    
+    var   totalRegistros = 0;
     const [pagina, setPagina] = useState(0);
+    const [registros, setRegistros] = useState([{}]);
+    const registrosPorPagina = 6;
+
     const empresa = props.e;
     const usuario = props.u;
     const nivel = props.n
@@ -38,7 +39,7 @@ function ConceptosForm(props) {
     const [desdeDate, setDesdeDate] = useState(new Date());
     const [hastaDate, setHastaDate] = useState(new Date());
     const [startDate, setStartDate] = useState(new Date());
-    const [aviso, setAviso] = useState('')
+    var   aviso = '';
 
     const [modalDel, setModalDel] = React.useState(false);
     const toggle_del = () => setModalDel(!modalDel);
@@ -58,61 +59,50 @@ function ConceptosForm(props) {
         await  axios.get('http://localhost:3000/api/conceptos/'+id)
         .then(res=>{
             misDatos=res.data; 
-          //  setRegistros(misDatos)
-            let totalRegs = misDatos.length;
-            setTotalRegistros(totalRegs);
-            setNumeroPaginas( Math.ceil(totalRegs / registrosPorPagina));
-            var libros =  subTablaPartir(pagina);
-           // setRegistros(libros)
-  alert('#### setT '+totalRegistros+' tot'+totalRegs+' npag'+numeroPaginas)
         })
+            totalRegistros = misDatos.length;
+            let numeroPaginas =  Math.ceil(totalRegistros / registrosPorPagina);
+            setNumeroPaginas(numeroPaginas);
+        await subPartirTabla(pagina);
+       
     }   
     //  Paginación
-    async function subTablaPartir(pagina){       
+    async function subPartirTabla(pagina){   
+            
             var ini = pagina * registrosPorPagina;
-            var fin = (ini + registrosPorPagina) ;
-            var xdatos = [{}]
-            let j=0;
+            var fin = ini + registrosPorPagina;
+            var tempData = []
             if(fin > totalRegistros) {fin = totalRegistros}
-alert('valores pg='+pagina+' i'+ini+' f '+fin);
-             for (var i = ini; i < fin; i++){
-                xdatos[j] = misDatos[i];
-                j+=1;
+            for (var i = ini; i < fin; i++){
+                tempData.push( misDatos[i] );
             }
-           setRegistros(xdatos)
-           // return xdatos; //misDatos;
+           setRegistros(tempData)
         }
 
 
     async function paginar(op){
-        // 0 primera, 9 ultima, 1 siguiente, 2 anterior, 0 ninguna
-        let pg = pagina;
-        alert(op)
-        switch (op) {
-           
-          case 2:
-            if (pg > 0){
-                pg -= 1;
-            }
+        // P primera, A anterior, S siguiente, U ultima
+alert(pagina)
+        let  pg = pagina;
+        switch (op) { 
+          case 'P':      
+            pg = 0
+         //     break;      
+          case 'A':
+            pg -= 1;
             if(pg <0){pg = 0}
         //    break;
-          case 0:      
-          pg = 0
-       //     break;
-          case 1: 
-            if (pg < (numeroPaginas-1)){
-                pg += 1;
-            }
-            if(pg >= numeroPaginas-1) {pg = (numeroPaginas-1)}
+          case 'S': 
+            pg += 1;
+            if(pg > numeroPaginas-1) {pg = (numeroPaginas-1)}
       //      break;
-          case 9:  
-          pg = (numeroPaginas - 1);
+          case 'U':  
+            pg = (numeroPaginas - 1);
       //      break;   
         }
-        setPagina(pg);
-        subTablaPartir(pg);
-        // var libros = subTablaPartir(pagina);
-        // setRegistros(libros, [])
+   alert(pg);
+   setPagina(pg);
+   await subPartirTabla(pg);
       }
 
            // Fecha de ISO a amd
@@ -162,7 +152,7 @@ alert('valores pg='+pagina+' i'+ini+' f '+fin);
         traeInfo(empresa)
         setModalPpal(!modalPpal);
         }else{
-            setAviso('Falta '+err)
+            aviso = 'Falta '+err;
         }
     }
     
@@ -177,7 +167,7 @@ alert('valores pg='+pagina+' i'+ini+' f '+fin);
 
     const handledSubmit = async (e) => {
         e.preventDefault();
-        setAviso('');
+        aviso = '';
     }
   
     const handledChange = ({target: {name, value}}) => {
@@ -221,10 +211,10 @@ alert('valores pg='+pagina+' i'+ini+' f '+fin);
             </table> 
             <div className='botones'>
                 <div>
-                    <button onClick={() => paginar(0)} className='boton btn'> |&#8612; </button>
-                    <button onClick={() => paginar(2)} className='boton btn'> &larr; </button>
-                    <button onClick={() => paginar(1)} className='boton btn'> &rarr; </button>
-                    <button onClick={() => paginar(9)} className='boton btn'> &#8614;| </button>
+                    <button onClick={() => paginar('P')} className='boton btn'> |&#8612; </button>
+                    <button onClick={() => paginar('A')} className='boton btn'> &larr; </button>
+                    <button onClick={() => paginar('S')} className='boton btn'> &rarr; </button>
+                    <button onClick={() => paginar('U')} className='boton btn'> &#8614;| </button>
                     <button onClick={() => handleShowPpal(conceptosW)} className='btn btn-sm btn-primary '>Nuevo registro</button>        
                 </div>
                 <div>
