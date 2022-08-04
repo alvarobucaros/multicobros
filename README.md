@@ -1,2 +1,2 @@
 # multicobros
-App para el control de pagos de deydas
+App para el control de pagos de deudas
