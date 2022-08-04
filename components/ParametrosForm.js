@@ -1,15 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState} from 'react';
 import {Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 function ParametrosForm(props) {
     const empresa = props.e;
     const usuario = props.u;
     const nivel = props.n;
-    const [iniDate, setIniDate] = useState(new Date());
-    const [finDate, setFinDate] = useState(new Date());
 
     var   [misDatos] = [{}];
 
@@ -42,9 +38,12 @@ useEffect(()=>{
 async function traeInfo(empresa){ 
   await  axios.get('http://localhost:3000/api/empresas/'+empresa)
   .then(res=>{
-      setEmpresas(res.data[0])
-      setIniDate(empresas.em_fchini.slice(0, -14))
-      setFinDate(empresas.em_fchfin.slice(0, -14))     
+    misDatos=res.data[0];       
+      for (var i = 0; i < misDatos.length; i++){
+        misDatos[i].em_fchini =  misDatos[i].em_fchini.slice(0, -14)
+        misDatos[i].em_fchfin =  misDatos[i].em_fchfin.slice(0, -14)    
+    }  
+    setEmpresas(misDatos) 
   })
 }
 
@@ -57,9 +56,7 @@ const handledSubmit = async (e) => {
 }
 
 async function ActualizaRegistro () { 
-  let err=''
-  empresas.em_fchini = iniDate;
-  empresas.em_fchfin = finDate;       
+  let err=''     
   if(empresas.em_nombre===''){err += ', Nombre';}
   if(empresas.em_direccion===''){err += ', Direción';}
   if(empresas.em_telefono===''){err += ', Teléfono';}

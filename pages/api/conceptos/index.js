@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         const dato = req.body.cpto;
  
         let sql = "SELECT id, cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, ";
-        sql += "cp_fechaHasta, cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica ";
+        sql += "cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica ";
         sql += " FROM conceptos WHERE id =  " + dato
   
         const [result] = await pool.query(sql);
@@ -41,32 +41,32 @@ export default async function handler(req, res) {
       const saveConceptos = async (req, res) => {
 
         const {id, cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, cp_fechaHasta, 
-               cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica} = req.body;
+               cp_valorCobro, cp_cuotas,  cp_valorCuota, cp_estado, cp_aplica} = req.body;
         if (id === 0){     
           const [result] = await pool.query("INSERT INTO Conceptos SET ?",
             {cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde,cp_fechaHasta, 
-            cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica})
+            cp_valorCobro, cp_cuotas,  cp_valorCuota, cp_estado, cp_aplica})
             return res.status(200).json({cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, 
-            cp_fechaHasta, cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica, id: result.insertId });  
+            cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica, id: result.insertId });  
         }
         else{
           const [result] = await pool.query("UPDATE Conceptos SET ? WHERE id = "+id,
           {cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde,cp_fechaHasta, 
-              cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica})
+              cp_valorCobro, cp_cuotas,  cp_valorCuota, cp_estado, cp_aplica})
           return res.status(200).json({cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, 
-              cp_fechaHasta, cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica, 
+              cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica, 
               id: result.insertId }); 
         }
       }
      
       const updateConceptos = async (req, res) => {
         const {cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, cp_fechaHasta, 
-            cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica} = req.body;
+            cp_valorCobro, cp_cuotas,  cp_valorCuota, cp_estado, cp_aplica} = req.body;
         const [result] = await pool.query("UPDATE Conceptos SET ?",
         {cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde,cp_fechaHasta, 
-            cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica})
+            cp_valorCobro, cp_cuotas,  cp_valorCuota, cp_estado, cp_aplica})
         return res.status(200).json({cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, 
-            cp_fechaHasta, cp_valorCobro, cp_valorCuota, cp_estado, cp_aplica, 
+            cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica, 
             id: result.insertId }); 
       }
     

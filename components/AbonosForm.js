@@ -9,7 +9,7 @@ function AbonosForm(props) {
     const empresa = props.e;
     const usuario = props.u;
     const nivel = props.n;
-    const[listo, setListo] = useState(false)
+   
 
     const [startDate, setStartDate] = useState(new Date());
     const [opcion, setOpcion] = useState('')
@@ -17,6 +17,7 @@ function AbonosForm(props) {
     const [nota1, setNota1] =useState('');
     const [nota2, setNota2] =useState('');
     const [nota3, setNota3] =useState('');
+    const [show, setShow]= useState(false)
 
     var   [misDatos] = [{}];
     const [usrs, setUsrs] = useState([])
@@ -32,8 +33,7 @@ function AbonosForm(props) {
       us_telefono:'',
       em_autentica:''
   })
-  
-  
+    
     useEffect(()=>{
       traeComboPpal(empresa)
     },[])
@@ -44,7 +44,6 @@ function AbonosForm(props) {
     //  http://localhost:3000/api/usuarios?e=2&op=abono
     
       const ruta = "http://localhost:3000/api/usuarios?e="+empresa+"&op=abono";
-  
       const res = await axios.get(ruta)
       .then(res=>{
           misDatos=res.data;               
@@ -59,28 +58,12 @@ function AbonosForm(props) {
            }));             
       })
     }
- 
-      async function traeInfoUsuarios(){ 
-           
-  
-
-        
-      }
-
-      const ActualizaRegistro= async (e) => {
-        e.preventDefault();
-        setAviso('')
-      }
-      
-      const handledChange = ({target: {name, value}}) => {
-        setIngregasto({...ingregasto, [name]: value});
-      }
       
       const handledSubmit = async (e) => {
         e.preventDefault();
       }
 
-      const handleSelectChange = (e) => {
+      async function handleSelectChange(e){ 
         let id = e.target.value;
        
         usuarios.forEach(object =>{
@@ -90,11 +73,22 @@ function AbonosForm(props) {
           if(object.em_autentica == 'C'){aplica = "Código: " + object.us_codigo;}
           if(object.em_autentica == 'D'){aplica = "Identificación: " + object.us_tipoDoc+' - '+object.us_nroDoc;}
           setNota1(object.us_nombre+ " " + '  (' +aplica+ ')');
-          setListo(true);
+          
         }
         })
-      //  var results = [ {"id":"10", "class": "child-of-9"}, {"id":"11", "classd": "child-of-10"} ];
-    }
+        let arg = "deudas|"+empresa+"|"+id
+        let url = 'http://localhost:3000/api/pagos?arg='+arg;  
+        const res = await axios.get(url)
+        .then(res=>{
+          misDatos=res.data;             
+        }) 
+        let saldo = 0;          
+        misDatos.map(dat => {             
+           saldo += parseInt(dat.cb_saldo);         
+        }) 
+        setNota2(' Debe $'+saldo)
+        setShow(true);
+     }
 
       return (
         <div className='container'>
@@ -112,7 +106,9 @@ function AbonosForm(props) {
                   ))} 
                 </select> 
               </div>
-              <span> Hola : {nota1}</span>
+               {show ?
+              <span> Hola : {nota1} {nota2}</span>
+              :''}
           </div>
             </form>
       </main>

@@ -6,9 +6,6 @@ function EmpresaForm(props) {
     const usuario = props.u;
     const nivel = props.n;
 
-    const [iniDate, setIniDate] = useState(new Date());
-    const [finDate, setFinDate] = useState(new Date());
-
     var   [misDatos] = [{}];
 
     const [empresas, setEmpresas] = useState({  
@@ -41,11 +38,14 @@ function EmpresaForm(props) {
     async function traeInfo(empresa){ 
         await  axios.get('http://localhost:3000/api/empresas/'+empresa)
         .then(res=>{
-            setEmpresas(res.data[0])
-            setIniDate(empresas.em_fchini.slice(0, -14))
-            setFinDate(empresas.em_fchfin.slice(0, -14))
-        }) 
-    } 
+          misDatos=res.data[0];       
+            for (var i = 0; i < misDatos.length; i++){
+              misDatos[i].em_fchini =  misDatos[i].em_fchini.slice(0, -14)
+              misDatos[i].em_fchfin =  misDatos[i].em_fchfin.slice(0, -14)    
+          }  
+          setEmpresas(misDatos) 
+        })
+      }
 
     const handledChange = ({target: {name, value}}) => {
         setEmpresas({...empresas, [name]: value});
@@ -58,9 +58,7 @@ function EmpresaForm(props) {
 
     
     async function ActualizaRegistro () { 
-        let err=''
-        empresas.em_fchini = iniDate;
-        empresas.em_fchfin = finDate;       
+        let err=''      
         if(empresas.em_nombre===''){err += ', Nombre';}
         if(empresas.em_direccion===''){err += ', Direción';}
         if(empresas.em_telefono===''){err += ', Teléfono';}
@@ -78,7 +76,6 @@ function EmpresaForm(props) {
     <div className='container'>
     <main className="form-signin w-800 m-auto">
         <form onSubmit={handledSubmit}>
-       
             <div className="d-flex align-items-sm-center mb0">
                 <label className="col-sm-6 col-form-label" htmlFor="em_nombre">Nombre</label>
                 <input type="text" className="form-control col-sm-10 ancho200" name='em_nombre' id="em_nombre" 
@@ -130,12 +127,12 @@ function EmpresaForm(props) {
             <div className="d-flex align-items-sm-center mb0">
                 <label className="col-sm-6 col-form-label" htmlFor="iniDate">Fecha Inicio</label>
                 <input type="date" className="form-control ancho100" name='iniDate' id="iniDate" 
-                    defaultValue={iniDate} /> 
+                    defaultValue={empresas.em_fchini} /> 
             </div>
             <div className="d-flex align-items-sm-center mb0">
                 <label className="col-sm-6 col-form-label" htmlFor="finDate">Fecha Final</label>
                 <input type="date" className="form-control ancho100" name='finDate' id="finDate" 
-                    defaultValue={finDate} /> 
+                    defaultValue={empresas.em_fchfin} /> 
             </div>
             <div className="checkbox mb-3 mb0">
             <label className="col-sm-6 col-form-label" htmlFor="em_estado">Estado</label>
@@ -147,6 +144,7 @@ function EmpresaForm(props) {
                     checked={empresas.em_estado === "I"}/> Inactivo
             </div>  
             <div className="checkbox mb-3 mb0">
+                <span  className='alert'>{aviso}</span>
                 <button color="primary" onClick={ActualizaRegistro}>Actualiza</button>
             </div>                  
         </form>

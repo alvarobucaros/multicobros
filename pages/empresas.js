@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 import Foot from '../components/footer'
 import Menu from '../components/Menu'
-import Contactenos from '../components/Contactenos'
+import ContactenosForm from '../components/ContactenosForm'
 import EmpresaForm from '../components/EmpresaForm'
 import ParametrosForm from '../components/ParametrosForm'
 import CargasForm from '../components/CargasForm'
-import Consultas from '../components/Consultas'
+import ConsultasForm from '../components/ConsultasForm'
 import { useRouter } from 'next/router'
 import {Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
 
@@ -33,16 +33,16 @@ export default function empresas() {
             <button className='btn-xs primary' onClick={() => setOpcion(2)}>Parámetros</button>
             <button className='btn-xs primary' onClick={() => setOpcion(3)}>Contáctenos</button>
             <button className='btn-xs primary' onClick={() => setOpcion(4)}>Carga y Descarga datos</button>
-            <button className='btn-xs primary' onClick={() => setOpcion(5)}>Consultas y Reportes</button>
+            <button className='btn-xs primary' onClick={() => setOpcion(5)}>Consultas e Informes</button>
             <span>{aviso[opcion]}</span>
           </div>
 
           <div className="tab-panels">
             {opcion == 1 ? <EmpresaForm e={e} u={u} n={n}/> : 
             opcion == 2 ? <ParametrosForm  e={e} u={u} n={n}/> :
-            opcion == 3 ? <Contactenos  e={e} u={u} n={n}/> :
+            opcion == 3 ? <ContactenosForm  e={e} u={u} n={n}/> :
             opcion == 4 ? <CargasForm  e={e} u={u} n={n}/> :
-            opcion == 5 ? <Consultas  e={e} u={u} n={n}/> :''}
+            opcion == 5 ? <ConsultasForm  e={e} u={u} n={n}/> :''}
               
           </div>
         </div>

@@ -1,9 +1,8 @@
 import React, { useEffect, useState} from 'react';
-import {Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
 import axios from 'axios';
-import DatePicker from "react-datepicker";
+import Image from 'next/image';
 import "react-datepicker/dist/react-datepicker.css";
-import ConceptosForm from './ConceptosForm';
+import { Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
 
 function CobrosForm(props) {
     const empresa = props.e;
@@ -11,13 +10,16 @@ function CobrosForm(props) {
     const nivel = props.n;
 
     var   [misDatos] = [{}];
-    const[listo, setListo] = useState(false)
+    const [listo, setListo] = useState(false)
     const [swtGrupo, setSwtGrupo] = useState(false)
     const [swtProcesa, setSwtProcesa] = useState(false)
+    const [swtLoad, setSwtLoad] = useState(false)
     const [aviso, setAviso] =useState();
     const [nota1, setNota1] =useState('');
     const [nota2, setNota2] =useState('');
     const [nota3, setNota3] =useState('');
+    const [modalDel, setModalDel] = React.useState(false);
+    const toggle_del = () => setModalDel(!modalDel);
 
     const [conceptos, setConceptos]  = useState({ 
       id:0, 
@@ -26,31 +28,31 @@ function CobrosForm(props) {
       cp_descripcion:'', 
       cp_fechaDesde:'', 
       cp_fechaHasta:'', 
-      cp_valorCobro:0, 
+      cp_valorCobro:0,
+      cp_cuotas:0,  
       cp_valorCuota:0, 
       cp_estado:'A', 
       cp_aplica:'T' 
   }) 
   
- const[ctaXcobrar, setCtaXcobrar] = useState({
-  id:0, 
-  cc_idEmpresa:empresa ,
-  cc_idConcepto:0 ,
-  cc_idGrupo:0 ,
-  cc_fechaProceso: new Date(),
-  cc_valor:0,
-  cc_saldo:0,
-  cc_activa:''
- })
+    const[ctaXcobrar, setCtaXcobrar] = useState({
+      id:0,
+      cc_idEmpresa:0,
+      cc_idConcepto:0 ,
+      cc_idGrupo:0,
+      cc_fechaProceso: new Date(),
+      cc_valor:0,
+      cc_saldo:0,
+      cc_activa:'',
+      cc_aplica:''
+    })
 
 
 
     const [cpto, setCpto] = useState([])
     const [notas, setNotas] = useState('')
     const [grpo, setGrpo] = useState([])
-    var grupoId = 0;
-    var conceptoId = 0
-
+   
     useEffect(()=>{
         traeComboPpal(empresa);
         traeGrupos(empresa);
@@ -89,11 +91,57 @@ async function traeGrupos(id)
     })
   }
 
-      const ActualizaRegistro= async (e) => {
-        e.preventDefault();
-        setAviso('')
-      }
+  async function traeCuentasXcobrar(empresa){
+    ctaXcobrar.cc_idEmpresa = empresa;    
+    let cp =  setCtaXcobrar.cc_idConcepto;
+    let gr = setCtaXcobrar.cc_idGrupo 
+    let url = 'http://localhost:3000/api/cuentasXcobrar?e='+empresa+'&cp='+cp+'&gr='+gr+'&op=existe';   
+    await  axios.get(url)
+    .then(res=>{
+        misDatos=res.data; 
+        if( misDatos.length === 0)  {
+          ActualizaCobros()
+        }
+        else{
+          let nota = 'Hay cobros pendientes del '
+          let saldo = 0;          
+          misDatos.map(dat => {             
+             nota += dat.cc_fechaProceso.slice(0, 7)+ ', ';
+             saldo += parseInt(dat.saldo);         
+            })
+          nota += ' por $'+ saldo
+          setAviso(nota)
+          handleShow(nota);
+        }
+    })
+  }
 
+  const Continua = () => {
+    setModalDel(false);
+    ActualizaCobros()
+  }
+
+  async function  ActualizaCobros() {
+    setSwtLoad(true);
+    let cp =  setCtaXcobrar.cc_idConcepto;
+    let gr = setCtaXcobrar.cc_idGrupo 
+    let arg = "ctaVlr|"+empresa+"|"+cp+"|"+gr
+    let url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;   
+    await  axios.post(url)
+    .then(res=>{
+      misDatos=res.data; 
+      
+    let fecha = misDatos[0].cp_fechaDesde.slice(0, 7)
+    let cuota = misDatos[0].cp_cuotas
+    let valor = misDatos[0].cp_valorCuota
+   alert('CREA CUENTAS CON '+empresa+'|'+cp+'|'+gr+'|'+fecha+'|'+cuota+'|'+valor)
+     
+    })
+    setSwtLoad(false);
+  }
+
+
+  
       async function fecha(fch){
      
           if (fch != null && fch !== undefined) {
@@ -112,6 +160,7 @@ async function traeGrupos(id)
         let id = e.target.value;
         setCtaXcobrar.cc_idConcepto= id;
         setCtaXcobrar.cc_idGrupo= 0;
+        setSwtLoad(false);
         conceptos.forEach(object =>{
           if(object.id == id){ 
             mostrarValores(object)
@@ -123,7 +172,8 @@ async function traeGrupos(id)
       let aplica = "Aplica para todos";
       setSwtGrupo(false)
       setSwtProcesa(false)
-      grupoId=0;
+    
+      setCtaXcobrar.cc_aplica=object.cp_aplica;
       if(object.cp_aplica == 'G'){
         aplica = "Aplica solo a un grupo";
         setSwtGrupo(true);
@@ -133,26 +183,31 @@ async function traeGrupos(id)
       }
       setNotas(aplica)
       setNota1(object.cp_titulo+ " " + object.cp_descripcion);
-      setNota2('Valor Deuda $'+ object.cp_valorCobro.toLocaleString("en-US", {style:"currency", currency:"USD"}) + " Valor cuota $"+ object.cp_valorCuota.toLocaleString("en-US", {style:"currency", currency:"EUR"}));
+      setNota2('Valor Deuda $'+ object.cp_valorCobro.toLocaleString("en-US", {style:"currency", currency:"USD"}) + " paga en " + object.cp_cuotas + " cuota(s) cada una de  $"+ object.cp_valorCuota.toLocaleString("en-US", {style:"currency", currency:"EUR"}));
       setNota3('Vigencia : del '+ object.cp_fechaDesde.split('T')[0] + " al "+ object.cp_fechaHasta.split('T')[0]);  
       setListo(true);
     }
 
     const handleSelectChangeGrpo = (e) =>{
       let id = e.target.value;
-      setCtaXcobrar.cc_idGrupo= id;
-     setSwtProcesa(true)
-      alert('Grupo : '+id);
+      setCtaXcobrar.cc_idGrupo = id;
+      setSwtProcesa(true)
     }
 
 
     const procesar = () => {
-alert ('Procesa el concepto :' + setCtaXcobrar.cc_idConcepto + ' con el grupo: '+setCtaXcobrar.cc_idGrupo)
+        traeCuentasXcobrar(empresa)
     }
+
+
+    function handleShow(rec){
+      setModalDel(!modalDel);
+  }
 
   return (
     <div className='container'>
       <form onSubmit={handledSubmit}>
+
           <div className="mb-1 row">
               <label className="col-sm-1 col-form-label" htmlFor="cp_titulo">Concepto</label>
               <div className="col-sm-9">            
@@ -161,10 +216,10 @@ alert ('Procesa el concepto :' + setCtaXcobrar.cc_idConcepto + ' con el grupo: '
                   defaultValue={conceptos.id} >
                     <option key={0} value={0}> Seleccione un concepto</option>
                     {cpto.map((cp)=>(
-                  <option key={cp.id} value={cp.id}> {cp.cp_titulo} - {cp.cp_descripcion}</option>
-                  
+                    <option key={cp.id} value={cp.id}> {cp.cp_titulo} - {cp.cp_descripcion}</option>
                   ))} 
                 </select> 
+
               </div>
           </div>
         { listo ?
@@ -183,7 +238,7 @@ alert ('Procesa el concepto :' + setCtaXcobrar.cc_idConcepto + ' con el grupo: '
               <div className="col-sm-9">            
                 <select id='grupo' name='grupo' className='form-control'
                   onChange={e => handleSelectChangeGrpo(e)}
-                  defaultValue={grupoId} >
+                  defaultValue={setCtaXcobrar.cc_idConcepto} >
                     <option key={0} value={0}> Seleccione un grupo</option>
                     {grpo.map((cp)=>(
                   <option key={cp.id} value={cp.id}> {cp.grp_nombre} - {cp.grp_detalle}</option>
@@ -196,10 +251,25 @@ alert ('Procesa el concepto :' + setCtaXcobrar.cc_idConcepto + ' con el grupo: '
           </div>          
           :''}
           {swtProcesa ?  
-            <div className="trc"><button onClick={() => procesar()} className='btn btn-sm btn-primary '>Procesa</button></div>
+            <div className="trc"><button onClick={() => procesar()} className='btn btn-sm btn-primary '>Procesa..</button></div>
             :''}
-
+            {swtLoad ?
+          <div className='col-xs-8'><Image className="mb-12 rounded strong" src="/loader.gif" alt="" width="80" height="70"/>
+          </div>
+          :''}
       </form>
+      <div className='modal1'>    
+          <Modal isOpen={modalDel} toggle_del={toggle_del}>
+          <ModalHeader  toggle_del={toggle_del}>Continua con el proceso ?? </ModalHeader>
+              <ModalBody>
+              <span> {aviso} </span>
+              <div>
+                  <Button color="primary" onClick={toggle_del}>NO</Button>
+                  <Button color="primary" onClick={Continua}>SI</Button>
+              </div>
+              </ModalBody>
+          </Modal>
+      </div>
     </div>
 
   )

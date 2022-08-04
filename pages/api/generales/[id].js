@@ -20,6 +20,7 @@ export default async function handler(req, res) {
             return;
     }
 }
+
 const getGeneral = async (req,res)  => {
   let id  = req.query.id;  
   let dato = id.split('|');
@@ -35,6 +36,7 @@ const getGeneral = async (req,res)  => {
   return res.status(200).json(result);
 
 }
+
 const saveGeneral = async (req,res)  => {
     let id  = req.query.id;
 }

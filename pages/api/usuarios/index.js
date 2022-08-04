@@ -20,8 +20,8 @@ export default async function handler(req, res) {
   }
 }
   const getUsers = async (req,res)  => {
-    let query   = req.query;
-    const {e, op} = query;
+    let query = req.query;
+    const {e, op, gr} = query;
    
     if (op==='user'){
     let sql= "SELECT id, us_idEmpresa, us_nombre, us_direccion, " 
@@ -40,7 +40,22 @@ export default async function handler(req, res) {
     const [result] = await pool.query(sql);
     return res.status(200).json(result);
   }
-
+  else if(op==='grupo'){
+    let sql = "(SELECT grupousuario.id AS id, gu_idEmpresa AS empresa, " 
+    sql += "gu_idUsuario AS usuario, gu_idGrupo AS grupo, us_nombre, 1 AS estado " 
+    sql += " FROM grupousuario  " 
+    sql += " INNER JOIN  usuarios ON gu_idUsuario = usuarios.id WHERE gu_idGrupo = " + gr
+    sql += " AND gu_idEmpresa = " + e +")" 
+    sql += " UNION " 
+    sql += " (SELECT 0 AS id , us_idEmpresa AS empresa, id AS usuario, 0 AS grupo," 
+    sql += " us_nombre, 0 AS estado FROM usuarios  WHERE us_idEmpresa = " + e  
+    sql += " AND id NOT IN ( SELECT gu_idUsuario FROM grupousuario " 
+    sql += " WHERE gu_idGrupo = " + gr + " AND gu_idEmpresa = " + e +"))" 
+    sql += " ORDER BY us_nombre ";
+    
+    const [result] = await pool.query(sql);
+    return res.status(200).json(result); 
+  
   }
   const deleteUsers = async (req, res)  => {
     const {id} = req.body;
@@ -64,4 +79,5 @@ export default async function handler(req, res) {
  
   const updateUsers = async (req, res) => {
    
+  }
   }

@@ -1,8 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState} from 'react';
 import { Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 function ConceptosForm(props) {
 
@@ -25,22 +23,20 @@ function ConceptosForm(props) {
         cp_fechaDesde:'', 
         cp_fechaHasta:'', 
         cp_valorCobro:0, 
+        cp_cuotas:0, 
         cp_valorCuota:0, 
         cp_estado:'A', 
         cp_aplica:'T' 
     })
 
     const [conceptosW, setConceptosW]  = useState({  
-        id:0,         cp_idEmpresa:empresa,         cp_titulo:'',
-        cp_descripcion:'',         cp_fechaDesde:'',         cp_fechaHasta:'', 
-        cp_valorCobro:0,         cp_valorCuota:0,         cp_estado:'A',         cp_aplica:'T' 
+        id:0, cp_idEmpresa:empresa, cp_titulo:'', cp_descripcion:'',
+        cp_fechaDesde:'', cp_fechaHasta:'', cp_valorCobro:0, cp_cuotas:0,
+        cp_valorCuota:0, cp_estado:'A', cp_aplica:'T' 
 
     })
-    const [desdeDate, setDesdeDate] = useState(new Date());
-    const [hastaDate, setHastaDate] = useState(new Date());
-    const [startDate, setStartDate] = useState(new Date());
-    var   aviso = '';
-
+  
+    const [aviso, setAviso] = useState('');
     const [modalDel, setModalDel] = React.useState(false);
     const toggle_del = () => setModalDel(!modalDel);
     const [modalPpal, setModalPpal] = React.useState(false);
@@ -60,6 +56,10 @@ function ConceptosForm(props) {
         .then(res=>{
             misDatos=res.data; 
         })
+        for (var i = 0; i < misDatos.length; i++){
+            misDatos[i].cp_fechaDesde =  misDatos[i].cp_fechaDesde.slice(0, -14)
+            misDatos[i].cp_fechaHasta =  misDatos[i].cp_fechaHasta.slice(0, -14)    
+        }
             totalRegistros = misDatos.length;
             let numeroPaginas =  Math.ceil(totalRegistros / registrosPorPagina);
             setNumeroPaginas(numeroPaginas);
@@ -82,7 +82,7 @@ function ConceptosForm(props) {
 
     async function paginar(op){
         // P primera, A anterior, S siguiente, U ultima
-alert(pagina)
+
         let  pg = pagina;
         switch (op) { 
           case 'P':      
@@ -100,24 +100,12 @@ alert(pagina)
             pg = (numeroPaginas - 1);
       //      break;   
         }
-   alert(pg);
+
    setPagina(pg);
    await subPartirTabla(pg);
       }
 
-           // Fecha de ISO a amd
-     async function fecha(fch){
-        var fecha = Date('MM/dd/YYY')
-       
-         if (fch != null && fch !== undefined) {
-            fecha = fch.toLocaleDateString("en-US")  // m/d/a
-            fch = fecha.split('/')
-            fch = fch[2]+'/'+fch[0]+'/'+fch[1]
-        }else{
-            fch=new Date();
-        }
-       return fch;
-    }
+
       function handleShow(rec){
         setDetBorrado(rec.cp_titulo + ' - ' + rec.cp_descripcion);
         setCodBorrado(rec.id)
@@ -126,24 +114,26 @@ alert(pagina)
    
     async function handleShowPpal(rec){
         setConceptos(rec)
-        if(conceptos.id > 0){
-            setDesdeDate(await fecha(conceptos.cp_fechaDesde))
-            setHastaDate(await fecha(conceptos.cp_fechaHasta))
-        }
         setModalPpal(!modalPpal);
     }
 
     async function ActualizaRegistro () { 
         let err=''
-        conceptos.cp_idEmpresa=empresa;
-        conceptos.cp_fechaDesde = await fecha(desdeDate)
-        conceptos.cp_fechaHasta = await fecha(hastaDate)
-        if(conceptos.cp_titulo===''){err += ', Título';}
-        if(conceptos.cp_descripcion===''){err += ', Descripción';}
-        if(conceptos.cp_valorCobro===''){err += ', Valor Cobro';}
-        if(conceptos.cp_valorCobro===0){err += ', Cobro debe ser mayor a cero';}
+        setAviso(err);
+        conceptos.cp_idEmpresa=empresa;      
+        if(conceptos.cp_titulo===''){err += 'Falta Título';}
+        if(conceptos.cp_descripcion===''){err += ', Falta Descripción';}
+        if(conceptos.cp_valorCobro===''){err += ',Falta Valor Cobro';}
+        if(conceptos.cp_valorCobro ==0){err += ', Cobro debe ser mayor a cero';}
         if(conceptos.cp_valorCuota===''){err += ', Valor Cuota';}
-        if(conceptos.cp_valorCuota===0){err += ', Cuota debe ser mayor a cero';}
+        if(conceptos.cp_cuotas===0 ){err += ',Falta nro cuotas';}
+        
+        if(conceptos.cp_cuotas > 0){
+            let tmp = conceptos.cp_valorCuota / conceptos.cp_cuotas ;
+            if (tmp != conceptos.cp_valorCuota ){
+                err += ', El valor Deuda no es igual a cuotas * valor cuota';
+            }
+        }
         if(conceptos.cp_fechaDesde > conceptos.cp_fechaHasta){err += ', Fecha final mayor a la de inicio ';}
         if (err===''){
         await  axios.post('http://localhost:3000/api/conceptos', conceptos)
@@ -152,7 +142,7 @@ alert(pagina)
         traeInfo(empresa)
         setModalPpal(!modalPpal);
         }else{
-            aviso = 'Falta '+err;
+            setAviso('Nota: '+err);
         }
     }
     
@@ -174,6 +164,12 @@ alert(pagina)
         setConceptos({...conceptos, [name]: value});
     }
 
+    const calculaCuota = () => {
+        conceptos.cp_valorCuota = 0;
+        if (conceptos.cp_cuotas > 0){
+        setConceptos.cp_valorCuota = conceptos.cp_valorCobro / conceptos.cp_cuotas;
+        }
+    }
     return (
     <div>
         <div>
@@ -184,7 +180,8 @@ alert(pagina)
                         <th className="">Detalle</th>
                         <th className="">Fecha Desde</th>
                         <th className="">Fecha Hasta</th>
-                        <th className="">Valor Total</th>   
+                        <th className="">Valor Total</th>
+                        <th className="">Nr Cuotas</th>                          
                         <th className="">Valor Cuota</th>
                         <th className="">Aplica</th> 
                         <th className="">Estado</th>                             
@@ -197,9 +194,10 @@ alert(pagina)
                     <tr key={rec.id}>
                         <td className="trc">{rec.cp_titulo}</td>
                         <td className="trl">{rec.cp_descripcion}</td>
-                        <td className="trc">{rec.cp_periodoDesde}</td>
-                        <td className="trc">{rec.cp_periodoHasta}</td>
+                        <td className="trc">{rec.cp_fechaDesde}</td>
+                        <td className="trc">{rec.cp_fechaHasta}</td>
                         <td className="trr">{rec.cp_valorCobro}</td>
+                        <td className="trc">{rec.cp_cuotas}</td>
                         <td className="trr">{rec.cp_valorCuota}</td>
                         <td className="trc">{rec.cp_aplica}</td>
                         <td className="trc">{rec.cp_estado}</td>
@@ -263,6 +261,15 @@ alert(pagina)
                                         defaultValue={conceptos.cp_valorCobro} onChange={handledChange}/> 
                                     </div>
                                 </div>
+                                
+                                <div className="mb-1 row">
+                                    <label className="col-sm-3 col-form-label" htmlFor="cp_cuotas">Nr Cuotas</label>
+                                    <div className="col-sm-9">
+                                        <input type="text" className="form-control trr" name='cp_cuotas' id="cp_cuotas" 
+                                        defaultValue={conceptos.cp_cuotas} onChange={handledChange}
+                                       /> 
+                                    </div>
+                                </div>                                
                                 <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_valorCuota">Valor Cuota</label>
                                     <div className="col-sm-9">
@@ -273,13 +280,15 @@ alert(pagina)
                                 <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_fechaDesde">Fecha Inicio</label>
                                     <div className="col-sm-9">
-                                    <DatePicker selected={desdeDate} onChange={(date) => setDesdeDate(date)} />
+                                    <input type="date" className="form-control trl" name='cp_fechaDesde' id="cp_fechaDesde" 
+                                        defaultValue={conceptos.cp_fechaDesde} onChange={handledChange}/> 
                                     </div>
                                 </div>
                                 <div className="mb-1 row">
-                                    <label className="col-sm-3 col-form-label" htmlFor="cp_hastaDesde">Fecha Final</label>
+                                    <label className="col-sm-3 col-form-label" htmlFor="cp_fechaHasta">Fecha Final</label>
                                     <div className="col-sm-9">
-                                    <DatePicker selected={hastaDate} onChange={(date) => setHastaDate(date)} />
+                                    <input type="date" className="form-control trl" name='cp_fechaHasta' id="cp_fechaHasta" 
+                                        defaultValue={conceptos.cp_fechaHasta} onChange={handledChange}/> 
                                     </div>
                                 </div>
                                 <div className="mb-1 row">
@@ -303,9 +312,10 @@ alert(pagina)
                                         defaultValue={conceptos.cp_estado} onChange={handledChange}
                                         checked={conceptos.cp_estado === "I"}/> Inactivo
                                     </div>
-                                </div>                                                                                                               
+                                </div>   
+                                <span  className='alert'>{aviso}</span>                                                                                                            
                             </form>
-                            <span  className='alert'>{aviso}</span>
+                          
                         </div>
                         <ModalFooter>
                             <Button color="primary" onClick={toggle_ppal}>Ignora</Button>

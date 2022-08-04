@@ -1,9 +1,13 @@
 import {pool} from "../../../config/db";
 
 export default async function handler(req, res) {
-    if(req.method = 'GET'){
+
+    if(req.method === 'GET'){
           return await getGruposUsuario(req, res);
     }
+    if(req.method === 'POST'){
+        return await updateGruposUsuario(req, res);
+  }
 }
 const getGruposUsuario = async (req,res)  => {
 
@@ -26,3 +30,30 @@ const getGruposUsuario = async (req,res)  => {
     const [result] = await pool.query(sql);
     return res.status(200).json(result);        
   }
+
+  const updateGruposUsuario = async (req,res)  => {
+
+    let e = req.query.e;
+    let si  = req.query.si; 
+    let gr   = req.query.gr; 
+    let arr = si.split(',');
+ 
+    let sel = ''
+    for (let index = 0; index < arr.length; index++) {
+      if(arr[index] > 0){
+        sel += '('+e+',' +arr[index]+','+gr+')';
+      }
+      if(index < arr.length-1){sel += ','}
+    }
+
+    let sql = " DELETE FROM grupousuario WHERE id  > 0 AND gu_idGrupo = "
+    sql += gr + " AND gu_idEmpresa = " + e
+  
+    const [result] = await pool.query(sql);
+    sql = " INSERT INTO grupousuario(gu_idEmpresa, gu_idUsuario, gu_idGrupo) VALUES "
+    sql +=  sel.slice(0, -1)+";"
+  
+    const [result1] = await pool.query(sql);
+    return res.status(200).json(result1);  
+   
+}
