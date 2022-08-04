@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {pool} from "../../../config/db";
 
-
 export default async function handler(req, res) {
  
   switch(req.method){
@@ -20,9 +19,12 @@ export default async function handler(req, res) {
   }
 }
   const getUsers = async (req,res)  => {
-    let query = req.query;
-    const {e, op, gr} = query;
-   
+   // let query = req.query;
+   // const {e, op, gr} = query;
+    let e = req.query.e;
+    let op = req.query.op;
+    let gr = req.query.gr;
+
     if (op==='user'){
     let sql= "SELECT id, us_idEmpresa, us_nombre, us_direccion, " 
     sql += " us_localidad, us_barrio, us_ciudad, us_email, us_codigo, " 
@@ -41,6 +43,7 @@ export default async function handler(req, res) {
     return res.status(200).json(result);
   }
   else if(op==='grupo'){
+    let gr = req.query.gr;
     let sql = "(SELECT grupousuario.id AS id, gu_idEmpresa AS empresa, " 
     sql += "gu_idUsuario AS usuario, gu_idGrupo AS grupo, us_nombre, 1 AS estado " 
     sql += " FROM grupousuario  " 

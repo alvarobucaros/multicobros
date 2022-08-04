@@ -33,6 +33,17 @@ function AbonosForm(props) {
       us_telefono:'',
       em_autentica:''
   })
+
+  const [abono, setAbono]= useState('')
+
+  const [cobros, setCobros] = useState({
+    id:0, cb_idConcepto:'',
+    cp_titulo:'',
+    cb_periodo:'',
+    cb_cuota:'', 
+    cb_saldo:'',
+   
+  })
     
     useEffect(()=>{
       traeComboPpal(empresa)
@@ -41,8 +52,6 @@ function AbonosForm(props) {
       // id, us_idEmpresa, us_nombre, us_direccion, us_localidad, us_barrio, us_ciudad, us_email, us_codigo, us_tipoDoc, us_nroDoc, us_telefono, us_clave, us_estado, us_nivel
 
     async function traeComboPpal(empresa){ 
-    //  http://localhost:3000/api/usuarios?e=2&op=abono
-    
       const ruta = "http://localhost:3000/api/usuarios?e="+empresa+"&op=abono";
       const res = await axios.get(ruta)
       .then(res=>{
@@ -73,14 +82,14 @@ function AbonosForm(props) {
           if(object.em_autentica == 'C'){aplica = "Código: " + object.us_codigo;}
           if(object.em_autentica == 'D'){aplica = "Identificación: " + object.us_tipoDoc+' - '+object.us_nroDoc;}
           setNota1(object.us_nombre+ " " + '  (' +aplica+ ')');
-          
-        }
+                }
         })
         let arg = "deudas|"+empresa+"|"+id
         let url = 'http://localhost:3000/api/pagos?arg='+arg;  
         const res = await axios.get(url)
         .then(res=>{
-          misDatos=res.data;             
+          misDatos=res.data; 
+          setCobros(misDatos);            
         }) 
         let saldo = 0;          
         misDatos.map(dat => {             
@@ -90,26 +99,68 @@ function AbonosForm(props) {
         setShow(true);
      }
 
+    const handledChange = ({target: {name, value}}) => {
+      setAbono({...abono, [name]: value});
+    }
+
+    async function ActualizaRegistro(abono) {
+      alert (abono.abono);
+    }
+
       return (
-        <div className='container'>
+        <div className=''>
           <main className="form-signin w-800 m-auto">
           <form onSubmit={handledSubmit}>
-          <div className="mb-1 row">
-              <label className="col-sm-2 col-form-label" htmlFor="us_nombre">Deudor:</label>
-              <div className="col-sm-10">            
-                <select id='us_nombre' name='us_nombre' className='form-control'
-                  onChange={e => handleSelectChange(e)}
-                  defaultValue={usrs.id} >
-                  <option key={0} value={0}> Seleccione un deudor</option>
-                  {usrs.map((usr)=>(
-                   <option key={usr.id} value={usr.id}> {usr.us_nombre} - {usr.us_codigo}</option>                
-                  ))} 
-                </select> 
-              </div>
-               {show ?
-              <span> Hola : {nota1} {nota2}</span>
+            <div className="mb-1 row">
+                <label className="col-sm-2 col-form-label" htmlFor="us_nombre">Deudor:</label>
+                <div className="col-sm-10">            
+                  <select id='us_nombre' name='us_nombre' className='form-control'
+                    onChange={e => handleSelectChange(e)}
+                    defaultValue={usrs.id} >
+                    <option key={0} value={0}> Seleccione un deudor</option>
+                    {usrs.map((usr)=>(
+                    <option key={usr.id} value={usr.id}> {usr.us_nombre} - {usr.us_codigo}</option>                
+                    ))} 
+                  </select> 
+                </div>
+            </div>
+               {show ?  
+               <div className="mb-1 row">            
+                <div className='div_scroll'>
+                  <span> Hola : {nota1} {nota2}</span>
+                  <table   className='miTable'>
+                    <thead>  
+                      <tr key={0}>
+                        <th className="">Concepto</th>                            
+                        <th className="">Periodo</th> 
+                        <th className="">Saldo</th>                             
+                      
+                      </tr>
+                    </thead>
+                    <tbody> 
+                      {cobros.map((rec, key) =>                
+                      <tr key={rec.id}>
+                          <td className="trc">{rec.cp_titulo}</td>
+                          <td className="trl">{rec.cb_periodo}</td>
+                          <td className="trc">{rec.cb_saldo}</td>
+                      </tr>    
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className='container'>
+                    <div className="mb-1 row">
+                    <label className="col-sm-5 col-form-label" htmlFor="abono">Valor abono</label>
+                        <div className="col-sm-7 trr">
+                        <input type="text" className="form-control" name='abono' id="abono" 
+                            defaultValue={abono}  onChange={handledChange}/> 
+                        </div>
+                        <Button onClick={() => ActualizaRegistro(abono)} className='btn btn-sm btn-primary '>Actualiza</Button>
+                    </div>
+                  </div>
+                </div>
               :''}
-          </div>
+         
             </form>
       </main>
     

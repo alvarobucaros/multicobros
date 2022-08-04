@@ -95,7 +95,8 @@ async function traeGrupos(id)
     ctaXcobrar.cc_idEmpresa = empresa;    
     let cp =  setCtaXcobrar.cc_idConcepto;
     let gr = setCtaXcobrar.cc_idGrupo 
-    let url = 'http://localhost:3000/api/cuentasXcobrar?e='+empresa+'&cp='+cp+'&gr='+gr+'&op=existe';   
+    let arg = 'existe+|'+empresa+'|'+cp+'|'+gr;
+    let url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;
     await  axios.get(url)
     .then(res=>{
         misDatos=res.data; 
@@ -125,17 +126,21 @@ async function traeGrupos(id)
     setSwtLoad(true);
     let cp =  setCtaXcobrar.cc_idConcepto;
     let gr = setCtaXcobrar.cc_idGrupo 
-    let arg = "ctaVlr|"+empresa+"|"+cp+"|"+gr
+    let arg = "ctaVlr|"+empresa+"|"+cp+"|"+gr;
     let url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;   
     await  axios.post(url)
     .then(res=>{
       misDatos=res.data; 
-      
-    let fecha = misDatos[0].cp_fechaDesde.slice(0, 7)
-    let cuota = misDatos[0].cp_cuotas
-    let valor = misDatos[0].cp_valorCuota
-   alert('CREA CUENTAS CON '+empresa+'|'+cp+'|'+gr+'|'+fecha+'|'+cuota+'|'+valor)
-     
+    }) 
+    let fecha = misDatos[0].cp_fechaDesde.slice(0, 7);
+    let cuota = misDatos[0].cp_cuotas;
+    let valor = misDatos[0].cp_valorCuota;
+    arg = 'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor;
+   alert('CREA CUENTAS CON arg:'+arg)
+    url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;   
+    await  axios.get(url)
+    .then( alert('Información actualizada'),()=>{
+    
     })
     setSwtLoad(false);
   }

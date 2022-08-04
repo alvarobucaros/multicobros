@@ -22,13 +22,18 @@ export default async function handler(req, res) {
 }
 
 const getctaXcobrar = async (req,res)  => {
-
-  let e  = req.query.e;
-  let cp = req.query.cp; 
-  let gr = req.query.gr; 
-  let op = req.query.op; 
+  
+  // 'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor;
+  // 'ctaVlr|'+empresa+'|'+cp+'|'+gr;
+  // 'existe+|'+empresa+'|'+cp+'|'+gr;
+  let arg = req.query.arg;
+  let arr = arg.split('|');
+  let op = arr[0];
   
   if (op=='existe'){   
+    let e=arr[1];
+    let cp=arr[2];
+    let gr=arr[3];
     let sql = '';
     sql += " SELECT  cc_fechaProceso, sum(cc_valor) suma, sum(cc_saldo) saldo" 
     sql += " FROM cuentascobrar WHERE  cc_activa='A' AND cc_idEmpresa =  " + e
@@ -45,7 +50,29 @@ const getctaXcobrar = async (req,res)  => {
     sql += " ORDER BY cc_fechaProceso DESC "   ;
     const [result] = await pool.query(sql);
     return res.status(200).json(result);    
+  }  else if(op=='crear'){
+    let e=arr[1];
+    let cp=arr[2];
+    let gr=arr[3];
+    let nrCtas=arr[4];
+    let fecha=arr[5];
+    let valor=arr[6];
+    let dat = fecha.split('-');
+    let url = e+","+gr+","+cp+","+nrCtas+","+dat[0]+","+dat[1]+","+valor+")";
+    if (gr == 0){
+      url = "sp_creacxcuser("+url;
+    } else {
+      url = "sp_creacxcgrpuser("+url;
+    }
+    let sql = "CALL "+url;
+    console.log(sql)
+    // const [result] = await pool.query(sql);
+    // return res.status(200).json(result); 
   }
+
+  //'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor
+  // 2|17|30|10|2022-07|50000.00
+  // 2|0|56|7|2022-07|90.00
 }
   
 const savectaXcobrar = async (req,res)  => {

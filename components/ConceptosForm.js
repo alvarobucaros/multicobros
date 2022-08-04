@@ -231,7 +231,7 @@ function ConceptosForm(props) {
                         </div>
                         </ModalBody>
                     </Modal>
-                </div>
+                </div> 
 
                 <div className='modal1'>    
                     <Modal isOpen={modalPpal} toggle_ppal={toggle_ppal}>
