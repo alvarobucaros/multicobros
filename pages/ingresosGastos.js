@@ -2,7 +2,7 @@ import React from 'react'
 import Foot from '../components/footer'
 import Menu from '../components/Menu'
 import IngreGastForm from '../components/IngreGastForm'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router' 
 
 export default function ingresosGastos() { 
   const router = useRouter()

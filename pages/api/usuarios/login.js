@@ -28,13 +28,18 @@ const getUsers = async (req,res)  => {
 }
 const getLogin = async (req, res)  => {
     const dato = req.body.usu;
+    const usu = dato.us_email;
     var qry = "SELECT usuarios.id usuarioId, us_idEmpresa,  us_nombre, us_email, "
     qry += " us_clave, us_estado, us_nivel, us_idEmpresa empreasId, em_nombre"
     qry += " FROM usuarios INNER JOIN empresas ON empresas.id = us_idEmpresa"
-    qry += " WHERE us_email = '"+dato+"' OR us_telefono = '"+dato+"'  OR us_nroDoc = '"+dato+"'"
-    const [result] = await pool.query(qry)
-    return res.status(200).json(result);
+    qry += " WHERE us_email = '"+usu+"' OR us_telefono = '"+usu+"'  OR us_nroDoc = '"+usu+"'"
+  
+  // console.log(qry);
+   const [result] = await pool.query(qry)
+   return res.status(200).json(result);
+    
   }
+
   const updateUsers = async (req, res) => {
     const id = req.body.id;
     const clave = req.body.clave;

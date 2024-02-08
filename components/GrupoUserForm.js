@@ -1,8 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState} from 'react';
 import {Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import 'bootstrap/dist/css/bootstrap.css';
  
 function GruposForm(props) {
     const empresa = props.e;
@@ -37,11 +36,12 @@ function GruposForm(props) {
 
     useEffect(()=>{
       traeComboPpal(empresa)
+      traeInfoUsuarios(empresa)
     },[])
 
     async function traeComboPpal(empresa){ 
       let id =  "id, grp_nombre, grp_detalle|grupos|";
-      id += "grp_estado = 'A' AND grp_empresa = "  +empresa + "| grp_nombre";    
+      id += "grp_estado = 'A' AND grp_idEmpresa = "  +empresa + "| grp_nombre";    
       await  axios.get('http://localhost:3000/api/generales/'+id)
       .then(res=>{
           misDatos=res.data;               
@@ -57,8 +57,8 @@ function GruposForm(props) {
       })
     }
 
-      async function traeInfoUsuarios(llave){ 
-        await  axios.get("http://localhost:3000/api/usuarios?e="+llave.empresa+"&op=grupo&gr="+llave.grupo)
+      async function traeInfoUsuarios(empresa){ 
+        await  axios.get("http://localhost:3000/api/usuarios?e="+empresa)
         .then(res=>{
           setGrpUsuario(res.data) 
           setOpcion(true)

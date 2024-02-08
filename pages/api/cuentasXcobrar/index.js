@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
 const getctaXcobrar = async (req,res)  => {
   
-  // 'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor;
+
   // 'ctaVlr|'+empresa+'|'+cp+'|'+gr;
   // 'existe+|'+empresa+'|'+cp+'|'+gr;
   let arg = req.query.arg;
@@ -50,7 +50,26 @@ const getctaXcobrar = async (req,res)  => {
     sql += " ORDER BY cc_fechaProceso DESC "   ;
     const [result] = await pool.query(sql);
     return res.status(200).json(result);    
-  }  else if(op=='crear'){
+  }  
+  //'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor
+  // 2|17|30|10|2022-07|50000.00
+  // 2|0|56|7|2022-07|90.00
+}
+  
+  // 'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor;
+const savectaXcobrar = async (req,res)  => {
+  let arg = req.query.arg;
+  let arr = arg.split('|');
+  let op = arr[0];
+  let e  = arr[1];
+  let cp = arr[2];
+  if(op == 'ctaVlr'){
+    let sql = "";
+    sql += "SELECT cp_fechaDesde, cp_cuotas, cp_valorCuota "
+    sql +=  "FROM conceptos WHERE id="+ cp + " AND cp_idEmpresa = "+e
+    const [result] = await pool.query(sql);
+    return res.status(200).json(result); 
+  } else if(op == 'crear'){
     let e=arr[1];
     let cp=arr[2];
     let gr=arr[3];
@@ -65,27 +84,8 @@ const getctaXcobrar = async (req,res)  => {
       url = "sp_creacxcgrpuser("+url;
     }
     let sql = "CALL "+url;
-    console.log(sql)
-    // const [result] = await pool.query(sql);
-    // return res.status(200).json(result); 
-  }
-
-  //'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor
-  // 2|17|30|10|2022-07|50000.00
-  // 2|0|56|7|2022-07|90.00
-}
-  
-const savectaXcobrar = async (req,res)  => {
-  let arg = req.query.arg;
-  let arr = arg.split('|');
-  let op = arr[0];
-  let e  = arr[1];
-  let cp = arr[2];
-  if(op = 'ctaVlr'){
-    let sql = "";
-    sql += "SELECT cp_fechaDesde, cp_cuotas, cp_valorCuota "
-    sql +=  "FROM conceptos WHERE id="+ cp + " AND cp_idEmpresa = "+e
+   
     const [result] = await pool.query(sql);
     return res.status(200).json(result); 
-  } 
+  }
 }

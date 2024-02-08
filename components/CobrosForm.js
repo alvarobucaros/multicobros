@@ -2,7 +2,8 @@ import React, { useEffect, useState} from 'react';
 import axios from 'axios';
 import Image from 'next/image';
 import "react-datepicker/dist/react-datepicker.css";
-import { Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
+import { Button, Modal, ModalFooter, ModalHeader, ModalBody, Alert} from "reactstrap"
+
 
 function CobrosForm(props) {
     const empresa = props.e;
@@ -87,7 +88,7 @@ async function traeGrupos(id)
             "grp_detalle":dat.grp_detalle
           };
           return properties;
-          }));      
+        }));      
     })
   }
 
@@ -95,7 +96,7 @@ async function traeGrupos(id)
     ctaXcobrar.cc_idEmpresa = empresa;    
     let cp =  setCtaXcobrar.cc_idConcepto;
     let gr = setCtaXcobrar.cc_idGrupo 
-    let arg = 'existe+|'+empresa+'|'+cp+'|'+gr;
+    let arg = 'existe|'+empresa+'|'+cp+'|'+gr;
     let url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;
     await  axios.get(url)
     .then(res=>{
@@ -133,22 +134,23 @@ async function traeGrupos(id)
       misDatos=res.data; 
     }) 
     let fecha = misDatos[0].cp_fechaDesde.slice(0, 7);
-    let cuota = misDatos[0].cp_cuotas;
+    let cuota = misDatos[0].cp_cuotas
     let valor = misDatos[0].cp_valorCuota;
-    arg = 'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor;
-   alert('CREA CUENTAS CON arg:'+arg)
+    arg = 'crear|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor;
     url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;   
-    await  axios.get(url)
-    .then( alert('Información actualizada'),()=>{
-    
+    await  axios.post(url)
+    .then(  fin ,()=>{
+      
     })
     setSwtLoad(false);
   }
 
+  function fin(){
+    setSwtProcesa(false);
+    alert('Informacion procesada');
+  }
 
-  
       async function fecha(fch){
-     
           if (fch != null && fch !== undefined) {
               fch = fch.split('T')[0]
           }else{
@@ -188,7 +190,7 @@ async function traeGrupos(id)
       }
       setNotas(aplica)
       setNota1(object.cp_titulo+ " " + object.cp_descripcion);
-      setNota2('Valor Deuda $'+ object.cp_valorCobro.toLocaleString("en-US", {style:"currency", currency:"USD"}) + " paga en " + object.cp_cuotas + " cuota(s) cada una de  $"+ object.cp_valorCuota.toLocaleString("en-US", {style:"currency", currency:"EUR"}));
+      setNota2('Valor Deuda : '+ object.cp_valorCobro.toLocaleString("en-US", {style:"currency", currency:"USD"}) + " paga en " + object.cp_cuotas + " cuota(s) cada una de:  "+ object.cp_valorCuota.toLocaleString("en-US", {style:"currency", currency:"USD"}));
       setNota3('Vigencia : del '+ object.cp_fechaDesde.split('T')[0] + " al "+ object.cp_fechaHasta.split('T')[0]);  
       setListo(true);
     }
@@ -199,11 +201,9 @@ async function traeGrupos(id)
       setSwtProcesa(true)
     }
 
-
     const procesar = () => {
         traeCuentasXcobrar(empresa)
     }
-
 
     function handleShow(rec){
       setModalDel(!modalDel);
@@ -256,7 +256,7 @@ async function traeGrupos(id)
           </div>          
           :''}
           {swtProcesa ?  
-            <div className="trc"><button onClick={() => procesar()} className='btn btn-sm btn-primary '>Procesa..</button></div>
+            <div className="trc"><button onClick={() => procesar()} className='btn btn-sm btn-primary '>Procesa</button></div>
             :''}
             {swtLoad ?
           <div className='col-xs-8'><Image className="mb-12 rounded strong" src="/loader.gif" alt="" width="80" height="70"/>

@@ -2,10 +2,10 @@ import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
 import LinkMenu  from '../components/LinkMenu';
 import axios from 'axios';
-import { Button, Modal,  ModalHeader, ModalBody} from "reactstrap";
+import { Button, Modal, ModalHeader, ModalBody} from "reactstrap";
 
 function Menu(props) {
-    const nomEmpresa = "  EMPRESA COLOMBIANA DE PRUEBAS ";
+    const nomEmpresa = " MI EMPRESA COLOMBIANA DE PRUEBAS ";
     const nomUsuario = "Alvaro Ortiz";
     const nomTipo = "Consultas";
     const empresa = 2;
@@ -27,7 +27,6 @@ function Menu(props) {
     const handleClick = (e) => {
         e.preventDefault()
         setModal(true);
-
       }
 
       const ActualizaRegistro = (e) => {
@@ -67,17 +66,17 @@ function Menu(props) {
         <>
     <div className='mi-menu'>
         <div className='mn-flex'>
-            <div className='col-xs-8'><Image className="mb-12 rounded" src="/aei.png" alt="" width="50" height="40"/>
-                <a className="navbar-brand" href="https://appeinternet.com">MultiCobros</a>
+            <div className='col-xs-8'><Image className="" src="/logo.png" alt="" width="100" height="50"/>
+              
             </div>
             <div className='div-grupo'> 
                 <div className='div-flex div-center div-emp'><span >{nomEmpresa}</span></div>
-                <div className='div-flex div-center'> 
+                <div className='div-flex div-center div-usu trc'> 
                 <a href='#' onClick={handleClick}><span >{nomUsuario} - {nomTipo}</span> </a> </div>
             </div> 
         </div> 
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div className="container-xl">
+            <div className="container-xl miTexto">
                 <LinkMenu links="/abonos" detalle="Pago de cuotas" empresa={empresa} usuario={usuario} nivel={nivel}/>
                 <LinkMenu links="/anticipos" detalle="Pago anticipado" empresa={empresa} usuario={usuario} nivel={nivel}/>
                 <LinkMenu links="/cobros" detalle="Ctas por Cobrar" empresa={empresa} usuario={usuario} nivel={nivel}/>
@@ -87,6 +86,7 @@ function Menu(props) {
                 <LinkMenu links="/grupoUser" detalle="Grupos de usuarios" empresa={empresa} usuario={usuario} nivel={nivel}/>
                 <LinkMenu links="/conceptos" detalle="Conceptos" empresa={empresa} usuario={usuario}  nivel={nivel}/>
                 <LinkMenu links="/empresas" detalle="Parámetros" empresa={empresa} usuario={usuario} nivel={nivel}/>
+                <LinkMenu links="/salida" detalle="Salir" empresa={empresa} usuario={usuario} nivel={nivel}/>
                 <span className='div-right'>{props.titulo}</span>
             </div>
         </nav>

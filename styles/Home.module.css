@@ -21,6 +21,9 @@
   align-items: center;
 }
 
+.footer div{
+background-color: chocolate;
+}
 .footer a {
   display: flex;
   justify-content: center;

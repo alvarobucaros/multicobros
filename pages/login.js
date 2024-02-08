@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-
+import Menu from '../components/Menu'
 import Image from 'next/image'
 import axios from 'axios'
 
@@ -29,23 +29,27 @@ const handledSubmit = async (e) => {
     if(usuarios.us_email==='' || usuarios.us_clave===''){
         setAviso('Falta el email o la contraseña');
     }else{
+       
         const ruta = "http://localhost:3000/api/usuarios/login";
-        const res = await axios.post(ruta,{usu:usuarios.us_email})
-        .then(res=>{
-        
-            var misDatos=res.data;
-            if (misDatos.length===0){
-                setAviso('Usuario no existe o contraseña inválida');
+        await axios.post(ruta,{usu:usuarios})
+        .then(res=>{        
+            var misDatos=res.data[0];
+      
+            if(typeof misDatos == "undefined" ){
+                setAviso('Usuario no registrado');  
+                return false
             }
-            if (misDatos.us_estado === 'I'){
-                setAviso('Usuario no está habilitado');
-            }
-            if (md5(usuarios.us_clave) !== misDatos.us_clave){
-                setAviso('Contraseña inválida');
-            }
-            if(aviso===''){
-                setAviso(misDatos.us_nombre);
-            }
+
+                if (misDatos.us_estado === 'I'){
+                    setAviso('Usuario no está habilitado');
+                }
+                if (md5(usuarios.us_clave) !== misDatos.us_clave){
+                    setAviso('Contraseña inválida');
+                }
+        if(aviso===''){
+            <Menu/>
+           // return true;
+        }
 
     })
     }
@@ -53,9 +57,9 @@ const handledSubmit = async (e) => {
 
     return (
       <div>
-        <main className="form-signin w-100 m-auto">
+        <main className="form-signin div-center">
         <form onSubmit={handledSubmit}>
-            <Image className="mb-8 rounded" src="/aei.png" alt="" width="60" height="60"/>
+            <Image className="mb-8 rounded" src="/logo.png" alt="" width="100" height="60"/>
             <h3 className="h3 mb-3 fw-normal text-center">Autenticación</h3>
 
             <div className="row g-3 align-items-center">
@@ -79,7 +83,7 @@ const handledSubmit = async (e) => {
             <div className='form-group'>
                 <span>{aviso}</span>
             </div>  
-            <p className="mt-5 mb-3 text-center">&copy; 2021–2022</p>
+            <p className="mt-5 mb-3 text-center">&copy; 2022–2023</p>
         </form>
         </main>
     </div>

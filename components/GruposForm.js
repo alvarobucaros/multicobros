@@ -16,10 +16,7 @@ function GruposForm(props) {
     var   totalRegistros = 0;
     const [pagina, setPagina] = useState(0);
 
-    const [startDate, setStartDate] = useState(new Date());
-    const [opcion, setOpcion] = useState('')
     const [aviso, setAviso] =useState('');
-
 
     const [grupos, setGrupos]  = useState({  
       id:0, 
@@ -141,7 +138,7 @@ async function ActualizaRegistro () {
     .then( alert('Información actualizada'),()=>{
     })   
   }
- 
+  
   traeInfo(empresa)
   setModalPpal(!modalPpal);
   }else{
@@ -194,11 +191,10 @@ return (
       </table> 
       <div className='botones'>
           <div>
-              <button onClick={() => paginar(0)} className='boton btn'> |&#8612; </button>
-              <button onClick={() => paginar(2)} className='boton btn'> &larr; </button>
-              <button onClick={() => paginar(1)} className='boton btn'> &rarr; </button>
-              <button onClick={() => paginar(9)} className='boton btn'> &#8614;| </button>
-              <button onClick={() => handleShowPpal(gruposW)} className='btn btn-sm btn-primary '>Nuevo registro</button>        
+          <button onClick={() => paginar('P')} className='btn btn-outline-primary  btn-sm'> |&#8612; </button>
+                    <button onClick={() => paginar('A')} className='btn btn-outline-primary btn-sm'> &larr; </button>
+                    <button onClick={() => paginar('S')} className='btn btn-outline-primary btn-sm'> &rarr; </button>
+                    <button onClick={() => paginar('U')} className='btn btn-outline-primary btn-sm'> &#8614;| </button>              <button onClick={() => handleShowPpal(gruposW)} className='btn btn-sm btn-primary '>Nuevo registro</button>        
           </div>
           <div>
               <span>Página {pagina+1} de {numeroPaginas}  

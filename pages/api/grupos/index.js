@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         const {id, grp_empresa, grp_nombre, grp_detalle, grp_estado} = req.body;
         const sql = "INSERT INTO Grupos SET ?"
         const [result] = await pool.query(sql, 
-                                    {grp_empresa, grp_nombre, grp_detalle, grp_estado})
+            {grp_empresa, grp_nombre, grp_detalle, grp_estado})
 
         return res.status(200).json({grp_empresa, grp_nombre, grp_detalle, grp_estado, 
             id: result.insertId });  

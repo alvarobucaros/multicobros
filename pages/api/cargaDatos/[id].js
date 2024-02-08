@@ -5,23 +5,23 @@ export default async function handler(req, res) {
  
     switch(req.method){
       case 'GET':
-        return await getConceptos(req, res);
+        return await getCarga(req, res);
   
       case 'POST': 
-        return await getMasConceptos(req, res);
+        return await saveMasCarga(req, res);
    
       case 'PUT': 
-        return await updateConceptos(req, res);
+        return await updateCarga(req, res);
         
       case 'DELETE':
-        return await deleteConceptos(req, res);
+        return await deleteCarga(req, res);
 
       default:
             return;
     }
 
 }
-    const getConceptos = async (req,res)  => {
+    const getCarga = async (req,res)  => {
         let id  = req.query.id;
         let sql = "SELECT id, cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, ";
         sql += "cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica ";
@@ -31,23 +31,32 @@ export default async function handler(req, res) {
         return res.status(200).json(result);
       }
 
-      const getMasConceptos = async (req,res)  => {
-        let id  = req.query.id;
-        let sql = "SELECT id, cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, ";
-        sql += "cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica ";
-        sql += " FROM conceptos WHERE cp_estado='A' AND cp_idEmpresa = ?" 
-        sql += " ORDER BY cp_titulo "
-        const [result] = await pool.query(sql,id);
-        return res.status(200).json(result);     
+      const saveMasCarga = async (req,res)  => {
+       console.log(req.us_codigo+' '+req.us_clave+' '+req.us_email); 
+
+        const {id, us_idEmpresa, us_nombre, us_direccion,  us_localidad, 
+          us_barrio, us_ciudad, us_email, us_codigo, us_tipoDoc, us_nroDoc, 
+          us_telefono, us_clave, us_estado, us_nivel } = req.body;
+          console.log(us_codigo+' '+us_clave+' '+us_email); 
+        const   [result] = await pool.query("INSERT INTO usuarios SET ?",
+        {us_idEmpresa, us_nombre, us_direccion,  us_localidad, us_barrio, us_ciudad, 
+          us_email, us_codigo, us_tipoDoc, us_nroDoc, us_telefono, us_clave, us_estado, 
+          us_nivel} )
+ 
+            return res.status(200).json({us_idEmpresa, us_nombre, us_direccion,  us_localidad, 
+              us_barrio, us_ciudad, us_email, us_codigo, us_tipoDoc, us_nroDoc, 
+              us_telefono, us_clave, us_estado, us_nivel,
+              id: result.insertId });       
+
       }
   
-      const deleteConceptos = async (req, res)  => {
+      const deleteCarga = async (req, res)  => {
         const {id} = req.body;
         const [result] = await pool.query("DELETE FROM conceptos WHERE id = ?",{id})
         return res.status(200).json(result);
       }
       
-      const saveConceptos = async (req, res) => {
+      const saveCarga = async (req, res) => {
         const {id, cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, cp_fechaHasta, 
                cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica} = req.body;
   
@@ -59,7 +68,7 @@ export default async function handler(req, res) {
             id: result.insertId });  
       }
      
-      const updateConceptos = async (req, res) => {
+      const updateCarga = async (req, res) => {
         const {cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, cp_fechaHasta, 
             cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica} = req.body;
         const [result] = await pool.query("UPDATE Conceptos SET ?",

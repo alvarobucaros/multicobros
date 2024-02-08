@@ -23,3 +23,5 @@ https://dev.to/kennymark/how-to-send-serverless-emails-with-next-js-and-sengrid-
 Ejemplo de check
 https://cheatcode.co/tutorials/how-to-build-a-select-all-list-component-in-react-with-next-js
 
+LogOut
+https://keepcoding.io/blog/ejecutar-un-logout-en-react/#:~:text=Ahora%2C%20para%20ejecutar%20un%20logout,estado%20es%20verdadero%20se%20bloquear%C3%A1n.

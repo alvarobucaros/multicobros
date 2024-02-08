@@ -45,7 +45,7 @@ function ConceptosForm(props) {
     const [codBorrado, setCodBorrado] = useState('');
     const [detBorrado, setDetBorrado] = useState('');
 
-    // trae datos de la tabla principal  
+    // trae datos de la tabla principal   
     useEffect(()=>{
         traeInfo(empresa)
     },[])
@@ -56,13 +56,14 @@ function ConceptosForm(props) {
         .then(res=>{
             misDatos=res.data; 
         })
+		// si trae fechas
         for (var i = 0; i < misDatos.length; i++){
             misDatos[i].cp_fechaDesde =  misDatos[i].cp_fechaDesde.slice(0, -14)
             misDatos[i].cp_fechaHasta =  misDatos[i].cp_fechaHasta.slice(0, -14)    
         }
-            totalRegistros = misDatos.length;
-            let numeroPaginas =  Math.ceil(totalRegistros / registrosPorPagina);
-            setNumeroPaginas(numeroPaginas);
+		totalRegistros = misDatos.length;
+		let numeroPaginas =  Math.ceil(totalRegistros / registrosPorPagina);
+		setNumeroPaginas(numeroPaginas);
         await subPartirTabla(pagina);
        
     }   
@@ -126,7 +127,7 @@ function ConceptosForm(props) {
         if(conceptos.cp_valorCobro===''){err += ',Falta Valor Cobro';}
         if(conceptos.cp_valorCobro ==0){err += ', Cobro debe ser mayor a cero';}
         if(conceptos.cp_valorCuota===''){err += ', Valor Cuota';}
-        if(conceptos.cp_cuotas===0 ){err += ',Falta nro cuotas';}
+        if(conceptos.cp_cuotas===0 ){err += ',Falta nro cuotas';} 
         
         if(conceptos.cp_cuotas > 0){
             let tmp = conceptos.cp_valorCuota / conceptos.cp_cuotas ;
@@ -134,6 +135,7 @@ function ConceptosForm(props) {
                 err += ', El valor Deuda no es igual a cuotas * valor cuota';
             }
         }
+        
         if(conceptos.cp_fechaDesde > conceptos.cp_fechaHasta){err += ', Fecha final mayor a la de inicio ';}
         if (err===''){
         await  axios.post('http://localhost:3000/api/conceptos', conceptos)
@@ -209,11 +211,10 @@ function ConceptosForm(props) {
             </table> 
             <div className='botones'>
                 <div>
-                    <button onClick={() => paginar('P')} className='boton btn'> |&#8612; </button>
-                    <button onClick={() => paginar('A')} className='boton btn'> &larr; </button>
-                    <button onClick={() => paginar('S')} className='boton btn'> &rarr; </button>
-                    <button onClick={() => paginar('U')} className='boton btn'> &#8614;| </button>
-                    <button onClick={() => handleShowPpal(conceptosW)} className='btn btn-sm btn-primary '>Nuevo registro</button>        
+                <button onClick={() => paginar('P')} className='btn btn-outline-primary  btn-sm'> |&#8612; </button>
+                    <button onClick={() => paginar('A')} className='btn btn-outline-primary btn-sm'> &larr; </button>
+                    <button onClick={() => paginar('S')} className='btn btn-outline-primary btn-sm'> &rarr; </button>
+                    <button onClick={() => paginar('U')} className='btn btn-outline-primary btn-sm'> &#8614;| </button>                    <button onClick={() => handleShowPpal(conceptosW)} className='btn btn-sm btn-primary '>Nuevo registro</button>        
                 </div>
                 <div>
                     <span>Página {pagina+1} de {numeroPaginas}  

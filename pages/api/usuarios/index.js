@@ -1,8 +1,7 @@
-import { useState } from "react";
+
 import {pool} from "../../../config/db";
 
-export default async function handler(req, res) {
- 
+export default async function handler(req, res) { 
   switch(req.method){
     case 'GET':
       return await getUsers(req, res);
@@ -15,12 +14,14 @@ export default async function handler(req, res) {
       
     case 'DELETE':
       return await deleteUsers(req, res);
-   //   return res.status(200).json('Delete products')
+      
+      default:
+        return;   
   }
 }
+
   const getUsers = async (req,res)  => {
-   // let query = req.query;
-   // const {e, op, gr} = query;
+
     let e = req.query.e;
     let op = req.query.op;
     let gr = req.query.gr;
@@ -60,6 +61,7 @@ export default async function handler(req, res) {
     return res.status(200).json(result); 
   
   }
+}
   const deleteUsers = async (req, res)  => {
     const {id} = req.body;
     const [result] = await pool.query("DELETE FROM usuarios WHERE id = ?",{id})
@@ -67,11 +69,17 @@ export default async function handler(req, res) {
   }
   
   const saveUsers = async (req, res) => {
-    const {id, us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email, us_codigo,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel} = req.body;
+    const {id, us_idEmpresa, us_nombre, us_direccion, us_localidad, us_barrio,
+      us_ciudad, us_email, us_codigo, us_tipoDoc, us_nroDoc, us_telefono, us_clave,
+      us_estado, us_nivel} = req.body;
     if (id === 0){ 
-    const [result] = await pool.query("INSERT INTO usuarios SET ?",
-    {us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email, us_codigo,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel})
-    return res.status(200).json({us_idEmpresa,us_nombre,us_direccion,us_localidad,us_barrio,us_ciudad,us_email, us_codigo,us_tipoDoc,us_nroDoc,us_telefono,us_clave,us_estado,us_nivel, id: result.insertId });
+      const [result] = await pool.query("INSERT INTO usuarios SET ?",
+      {us_idEmpresa, us_nombre, us_direccion, us_localidad, us_barrio,
+        us_ciudad, us_email, us_codigo, us_tipoDoc, us_nroDoc, us_telefono, us_clave,
+        us_estado, us_nivel})
+      return res.status(200).json({us_idEmpresa, us_nombre, us_direccion, us_localidad, us_barrio, 
+        us_ciudad, us_email, us_codigo, us_tipoDoc, us_nroDoc, us_telefono, us_clave,
+        us_estado, us_nivel, id: result.insertId });
     }
     else{
       const [result] = await pool.query("UPDATE usuarios SET ? WHERE id = "+id,
@@ -83,4 +91,4 @@ export default async function handler(req, res) {
   const updateUsers = async (req, res) => {
    
   }
-  }
+  

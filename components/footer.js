@@ -1,14 +1,25 @@
+import React from 'react';
+import {Foot} from "reactstrap";
 
 function footer() {
   return (
-    <footer >
-    <a
-      href="https://appeinternet.com"          >
-      <span >
-      Desarrollado por App e Internet
-      </span>
-    </a>
+    
+    <footer>  
+      <div>     
+        <div>
+          <span className="subtit-right">Multi</span>
+          <span className="subtit-left">Cobros </span>
+
+          <a className='mb-4 trl' href="https://aortizc.com" >
+            <span>&nbsp;&nbsp;&nbsp;
+            Desarrollado por AOrtizC  &copy; 2023 - 2024
+            </span>
+          </a>
+        </div>  
+          
+      </div> 
   </footer>
+  
   )
 }
 

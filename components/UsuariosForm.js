@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState} from 'react';
 import { Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
 import md5 from 'js-md5'
-import "react-datepicker/dist/react-datepicker.css";
+import 'bootstrap/dist/css/bootstrap.css';
 
 function UsuariosForm(props) {
 
@@ -11,7 +11,7 @@ function UsuariosForm(props) {
     var   totalRegistros = 0;
     const [pagina, setPagina] = useState(0);
     const [registros, setRegistros] = useState([{}]);
-    const registrosPorPagina = 6;
+    const registrosPorPagina = 8;
 
     const empresa = props.e;
     const usuario = props.u;
@@ -30,8 +30,8 @@ function UsuariosForm(props) {
         us_nroDoc:'', 
         us_telefono:'', 
         us_clave:'', 
-        us_estado:'', 
-        us_nivel:''
+        us_estado:'A', 
+        us_nivel:'C'
     })
 
     const [usuariosW, setUsuariosW]  = useState({  
@@ -41,8 +41,7 @@ function UsuariosForm(props) {
       us_clave:'',  us_estado:'A',  us_nivel:'C'
     })
 
-    var   aviso = '';
-
+    const [aviso, setAviso] = useState('');
     const [modalDel, setModalDel] = React.useState(false);
     const toggle_del = () => setModalDel(!modalDel);
     const [modalPpal, setModalPpal] = React.useState(false);
@@ -62,9 +61,10 @@ function UsuariosForm(props) {
         .then(res=>{
             misDatos=res.data; 
         })
-            totalRegistros = misDatos.length;
-            let numeroPaginas =  Math.ceil(totalRegistros / registrosPorPagina);
-            setNumeroPaginas(numeroPaginas);
+
+        totalRegistros = misDatos.length;
+        let numeroPaginas =  Math.ceil(totalRegistros / registrosPorPagina);
+        setNumeroPaginas(numeroPaginas);
         await subPartirTabla(pagina);
        
     }   
@@ -84,7 +84,7 @@ function UsuariosForm(props) {
 
     async function paginar(op){
         // P primera, A anterior, S siguiente, U ultima
-alert(pagina)
+
         let  pg = pagina;
         switch (op) { 
           case 'P':      
@@ -102,7 +102,7 @@ alert(pagina)
             pg = (numeroPaginas - 1);
       //      break;   
         }
-   alert(pg);
+
    setPagina(pg);
    await subPartirTabla(pg);
       }
@@ -120,9 +120,10 @@ alert(pagina)
 
     async function ActualizaRegistro () { 
         let err=''
+        setAviso(err);
         usuarios.us_idEmpresa=empresa;
         if(usuarios.id == 0){
-            usuarios.us_clave = md5(usuarios.us_nroDoc);
+            usuarios.us_clave = md5(usuarios.us_telefono);
         }
         if(usuarios.us_nombre ===''){err += ', Nombre';}
         if(usuarios.us_email ===''){err += ', Correo';}
@@ -136,7 +137,7 @@ alert(pagina)
             traeInfo(empresa)
             setModalPpal(!modalPpal);
         }else{
-            aviso = 'Falta '+err;
+            setAviso('Falta '+err);
         }
     }
     
@@ -200,10 +201,10 @@ alert(pagina)
             </table> 
             <div className='botones'>
                 <div>
-                    <button onClick={() => paginar('P')} className='boton btn'> |&#8612; </button>
-                    <button onClick={() => paginar('A')} className='boton btn'> &larr; </button>
-                    <button onClick={() => paginar('S')} className='boton btn'> &rarr; </button>
-                    <button onClick={() => paginar('U')} className='boton btn'> &#8614;| </button>
+                    <button onClick={() => paginar('P')} className='btn btn-outline-primary  btn-sm'> |&#8612; </button>
+                    <button onClick={() => paginar('A')} className='btn btn-outline-primary btn-sm'> &larr; </button>
+                    <button onClick={() => paginar('S')} className='btn btn-outline-primary btn-sm'> &rarr; </button>
+                    <button onClick={() => paginar('U')} className='btn btn-outline-primary btn-sm'> &#8614;| </button>
                     <button onClick={() => handleShowPpal(usuariosW)} className='btn btn-sm btn-primary '>Nuevo registro</button>        
                 </div>
                 <div>
@@ -224,7 +225,7 @@ alert(pagina)
                     </Modal>
                 </div>
 
-                <div className='modal1'>    
+                <div className='modal2'>    
                     <Modal isOpen={modalPpal} toggle_ppal={toggle_ppal}>
                     <ModalHeader  toggle_ppal={toggle_ppal}>Actualiza información</ModalHeader>
                         <ModalBody>

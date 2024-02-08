@@ -13,7 +13,6 @@ function IngreGastForm(props) {
         id:0,
         em_nombre:'',
         em_direccion:'',
-        em_localidad:'',
         em_ciudad:'',
         em_tipodoc:'',
         em_nrodoc:'',
@@ -23,8 +22,8 @@ function IngreGastForm(props) {
         em_autentica:'',
         em_consecRcaja:'',
         em_consecEgreso:'',
-        em_fchini:'24/07/2013',
-        em_fchfin:'',
+        em_consecAjustes:'',
+        em_fchini:'',
         em_estado:'A',
         em_saldo:0
     });    

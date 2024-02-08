@@ -49,34 +49,37 @@ background-color: rgb(237, 234, 229);
 .div-flex{
   margin-top: 8px;
   margin-left: 8px;
-  align-content: flex-end;
+  /* align-content: flex-end; */
   background: #e8e7e3;
   border: 1px solid #8a8a8a;
   border-radius: 8px;
   height: 33px;
+  width: 100%;
 }
 .div-grupo{
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  
 }
+
 .div-center{
   align-self: center;
 }
 .div-right {
-  border: 2px solid #FFF;
-  border-radius: 6px;
-
   color: #FFF;
   align-self: right;
   margin-left: 12px;
 }
 
 .div-emp{  color: rgb(150, 205, 235);
-
+  width: 800px; text-align: center;
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;}
 
+.div-usu{  color: rgb(150, 205, 235);
+    width: 80%;
+    align-items: end;
+  }
+    
 .mi-container{
   background-color: #8a8a8a;
   display: flex;
@@ -89,6 +92,15 @@ background-color: rgb(237, 234, 229);
   height: 95vh;
 }
 
+.mi-empresa{
+  background-color: #8a8a8a;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: space-between;
+  align-content: flex-start;
+  
+}
 .item{
   background-color: aquamarine;
   margin-left: 2px;
@@ -115,6 +127,10 @@ background-color: rgb(237, 234, 229);
 .modal1{
   display: 'block'; width: 700; padding: 30;
 }
+.modal2{
+  display: 'block'; width: 900; padding: 10;
+}
+
 
 table {
   border-collapse: collapse;
@@ -157,7 +173,7 @@ th {
 .mb0 {
   float: right;
   width: 500px;
-height:30px;}
+  height:30px;}
 
 .mt-0 {
   padding: auto;
@@ -182,10 +198,20 @@ height:30px;}
   font-size: 1.2em;
 }
 
+.subtit-right{
+  font-weight: bold;
+  color: rgb(65, 132, 199);
+}
+.subtit-left{
+  font-weight: bold;
+  color: #06c;
+}
 .strong{
   font-weight: bold;
   color: #06c;
 }
-.div_scroll{
-  width: 100%; height: 310px; overflow-y: scroll;
+.div_select{margin-left: 10%;  width: 80%;
+}
+.div_scroll{margin-left: 10%;
+  width: 80%; height: 310px; overflow-y: scroll;
 }

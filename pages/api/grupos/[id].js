@@ -23,8 +23,8 @@ export default async function handler(req, res) {
 
     const getGrupos = async (req,res)  => {
         let id  = req.query.id;
-        let sql = "SELECT id, grp_empresa, grp_nombre, grp_detalle, grp_estado ";
-        sql += " FROM grupos WHERE grp_empresa = ?" 
+        let sql = "SELECT id, grp_idEmpresa, grp_nombre, grp_detalle, grp_estado ";
+        sql += " FROM grupos WHERE grp_idEmpresa = ?" 
         sql += " ORDER BY grp_nombre ";
         const [result] = await pool.query(sql,id);
         return res.status(200).json(result);
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
 
       const getMasGrupos = async (req,res)  => {
         let id  = req.query.id;
-        let sql = "SELECT id, grp_empresa, grp_nombre, grp_detalle, grp_estado ";
+        let sql = "SELECT id, grp_idEmpresa, grp_nombre, grp_detalle, grp_estado ";
         sql += " FROM grupos WHERE id = ?" 
         sql += " ORDER BY grp_nombre ";
         const [result] = await pool.query(sql,id);
@@ -44,20 +44,20 @@ export default async function handler(req, res) {
       }
       
       const saveGrupos = async (req, res) => {
-        const {id, grp_empresa, grp_nombre, grp_detalle, grp_estado} = req.body;
+        const {id, grp_idEmpresa, grp_nombre, grp_detalle, grp_estado} = req.body;
         const sql = "INSERT INTO Grupos SET ?"
         const [result] = await pool.query(sql, 
-                                    {grp_empresa, grp_nombre, grp_detalle, grp_estado})
+        {grp_idEmpresa, grp_nombre, grp_detalle, grp_estado})
 
-        return res.status(200).json({grp_empresa, grp_nombre, grp_detalle, grp_estado, 
+        return res.status(200).json({grp_idEmpresa, grp_nombre, grp_detalle, grp_estado, 
             id: result.insertId });  
       }
      
       const updateGrupos = async (req, res) => {
-        const {id, grp_empresa, grp_nombre, grp_detalle, grp_estado} = req.body;
+        const {id, grp_idEmpresa, grp_nombre, grp_detalle, grp_estado} = req.body;
         const [result] = await pool.query("UPDATE Grupos SET ?",
-        {grp_empresa, grp_nombre, grp_detalle, grp_estado})
-        return res.status(200).json({grp_empresa, grp_nombre, grp_detalle, grp_estado, 
+        {grp_idEmpresa, grp_nombre, grp_detalle, grp_estado})
+        return res.status(200).json({grp_idEmpresa, grp_nombre, grp_detalle, grp_estado, 
             id: result.insertId }); 
       }
     

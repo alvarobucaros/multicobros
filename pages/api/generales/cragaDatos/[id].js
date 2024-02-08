@@ -31,15 +31,17 @@ const getGeneral = async (req,res)  => {
 
   let sql = "SELECT " + campos + " FROM " + tabla + " WHERE " + donde
   sql += " ORDER BY " + orden    
-console.log(sql);
+
   const [result] = await pool.query(sql)
   return res.status(200).json(result);
 
 }
 
 const saveGeneral = async (req,res)  => {
-    let id  = req.query.id;
+    let usuarios  = req.query.usuarios;
+    console.log(usuarios);
 }
+
 const updateGeneral = async (req,res)  => {
     let id  = req.query.id;
 }

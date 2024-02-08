@@ -9,16 +9,14 @@ export default function Home() {
   const [data, setData] = useState('');
   const [autentica, setAutentica] = useState(true);
   
-
   return (
     <div>
       <Head>
         <title>MultiCobros</title>
-        <meta name="description" content="Producto de AEI" />
+        <meta name="description" content="Producto de AOrtizC" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      
+    
         <header> 
           {
             (autentica)
@@ -26,9 +24,7 @@ export default function Home() {
             : <Login/>
           }
         </header>
-      
-
-
+  
       <Foot/>
     </div>
   )

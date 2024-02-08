@@ -1,7 +1,7 @@
-
 import {pool} from "../../../config/db";
 
 export default async function handler(req, res) {
+
     switch(req.method){
       case 'GET':
         return await getConceptos(req, res);
@@ -39,7 +39,6 @@ export default async function handler(req, res) {
       }
       
       const saveConceptos = async (req, res) => {
-
         const {id, cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, cp_fechaHasta, 
                cp_valorCobro, cp_cuotas,  cp_valorCuota, cp_estado, cp_aplica} = req.body;
         if (id === 0){     
