@@ -12,16 +12,6 @@ export default function cobros() {
   const n = router.query.n;
 
   return (
-    /*
-    <div className='mi-container'>
-        <div className="item item-head"><Menu titulo='Crea una sociedad y un usuario master'/></div>
-        <div className="item item-body">
-         <MiEmpresaForm/> 
-        </div>
-        <div className="item item-foot"><Foot/></div>
-    </div>
-*/
-
     <div className='mi-empresa'>
       <h3 className='item-body'>CREA UNA EMPRESA</h3>
         <div className="">

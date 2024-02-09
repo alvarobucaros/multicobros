@@ -101,6 +101,10 @@ background-color: rgb(237, 234, 229);
   align-content: flex-start;
   
 }
+
+hr.solid {
+  border-top: 3px solid #bbb;
+}
 .item{
   background-color: aquamarine;
   margin-left: 2px;

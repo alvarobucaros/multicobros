@@ -7,7 +7,7 @@ import Login from '../pages/login'
 export default function Home() {
 
   const [data, setData] = useState('');
-  const [autentica, setAutentica] = useState(true);
+  const [autentica, setAutentica] = useState(false);
   
   return (
     <div>

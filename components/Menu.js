@@ -74,7 +74,7 @@ function Menu(props) {
                 <div className='div-flex div-center div-usu trc'> 
                 <a href='#' onClick={handleClick}><span >{nomUsuario} - {nomTipo}</span> </a> </div>
             </div> 
-        </div> 
+        </div>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-xl miTexto">
                 <LinkMenu links="/abonos" detalle="Pago de cuotas" empresa={empresa} usuario={usuario} nivel={nivel}/>

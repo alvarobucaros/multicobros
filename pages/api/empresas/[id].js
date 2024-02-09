@@ -40,29 +40,56 @@ const deleteEmpresas = async (req, res)  => {
 }
 
 const saveEmpresas = async (req, res) => {
-  const {id, em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,em_email,
-     em_observaciones, em_autentica,em_consecRcaja,em_consecEgreso,em_consecAjustes,
-     em_fchini,em_estado,em_saldo} = req.body;
-  if (id === 0)
+  const {id, em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,
+         em_email, em_observaciones, em_autentica, em_consecAjustes,
+         em_consecRcaja,em_consecEgreso, em_fchini,em_fchfin,
+         em_estado,em_saldo, em_us_idEmpresa, em_us_nombre, em_us_direccion,
+         em_us_localidad, em_us_barrio, em_us_ciudad, em_us_email,
+         em_us_codigo, em_us_tipoDoc, em_us_nroDoc, em_us_clave, 
+         em_us_telefono, em_us_estado, em_us_nivel} = req.body;
+
+ // if (id === 0)
   {    
       const [result] = await pool.query("INSERT INTO Empresas SET ?",
-      {em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,em_email, 
-      em_observaciones, em_autentica,em_consecRcaja,em_consecEgreso,em_consecAjustes,
-      em_fchini,em_estado,em_saldo})
-  return res.status(200).json({em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,
-    em_telefono,em_email, em_observaciones, em_autentica,em_consecRcaja,em_consecEgreso,
-    em_consecAjustes,em_fchini,em_estado,em_saldo, 
-      id: result.insertId });  
+      {em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,
+        em_email,em_observaciones,em_autentica,em_consecAjustes,
+        em_consecRcaja,em_consecEgreso,em_fchini,em_fchfin,em_estado,em_saldo})
+      res.status(200).json({em_nombre,em_direccion,em_ciudad,em_tipodoc,
+        em_nrodoc,em_telefono,em_email,em_observaciones,em_autentica,
+        em_consecAjustes,em_consecRcaja,em_consecEgreso,em_fchini,em_fchfin,
+        em_estado,em_saldo, id: result.insertId });
+
+        const [resultUs] = await pool.query("INSERT INTO Empresas SET ?",
+        {em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,
+          em_email,em_observaciones,em_autentica,em_consecAjustes,
+          em_consecRcaja,em_consecEgreso,em_fchini,em_fchfin,em_estado,em_saldo})
+        res.status(200).json({em_nombre,em_direccion,em_ciudad,em_tipodoc,
+          em_nrodoc,em_telefono,em_email,em_observaciones,em_autentica,
+          em_consecAjustes,em_consecRcaja,em_consecEgreso,em_fchini,em_fchfin,
+          em_estado,em_saldo, id: resultUs.insertId });
+          res.json({
+              empresa: { id },
+          });
+          console.log(empresa.id);
+        return;
+
+ //   const [resultUs] = await pool.query("INSERT INTO Empresas SET ?",
+ //     {us_idEmpresa, us_nombre, us_direccion, us_localidad, us_barrio, us_ciudad, us_email, 
+ //       us_codigo, us_tipoDoc, us_nroDoc, us_clave, us_telefono, us_estado, us_nivel })
   }
-  else
-  {  
-      const [result] = await pool.query("UPDATE Empresas SET ? WHERE id = "+id,
-      {em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,em_email,
-          em_observaciones, em_autentica,em_consecRcaja,em_consecEgreso,em_consecAjustes,
-          em_fchini,em_estado,em_saldo})
-      return res.status(200).json({em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,em_email,
-          em_observaciones, em_autentica,em_consecRcaja,em_consecEgreso,em_consecAjustes,
-          em_fchini,em_estado,em_saldo, 
-          id: result.insertId }); 
-    } 
+
+
+
+
+//  else
+//  {  
+//      const [result] = await pool.query("UPDATE Empresas SET ? WHERE id = "+id,
+//      {em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,em_email,
+//          em_observaciones, em_autentica,em_consecRcaja,em_consecEgreso,em_consecAjustes,
+//          em_fchini,em_estado,em_saldo})
+//      return res.status(200).json({em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,em_email,
+//          em_observaciones, em_autentica,em_consecRcaja,em_consecEgreso,em_consecAjustes,
+//          em_fchini,em_estado,em_saldo, 
+//          id: result.insertId }); 
+//    } 
 }

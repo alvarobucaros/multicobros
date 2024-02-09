@@ -8,7 +8,7 @@ const LinkMenu = (props) => {
   const nivel = props.nivel;
 
   return (
-    <Link  href={{ pathname: links, query: { e: empresa, u:usuario, n:nivel} }}><a className='btn-sm btn-primary mi-btn'>{detalle}</a></Link>
+    <Link  href={{ pathname: links, query: { e:empresa, u:usuario, n:nivel} }}><a className='btn-sm btn-primary mi-btn'>{detalle}</a></Link>
   )
 }
 
