@@ -1,21 +1,26 @@
-import React, {useState} from 'react';
+import React, {createContext, useContext, useEffect, useMemo, useState} from 'react'
 import Menu from '../components/Menu'
 import Image from 'next/image'
-import axios from 'axios'
+import axios from 'axios';
+
 
 export default function Login() {
 
 const md5 = require('js-md5');
-
-const [usuarios, setUsuarios] = useState({  
-    id:0,
-    us_idEmpresa:0,
-    us_nombre:'',
-    us_email:'',
+const UserContext = createContext();
+const [usuarios, setUsuarios] = useState([{  
+    em_nombre:'',   
+    empreasId:0,
     us_clave:'',
+    us_email:'',
     us_estado:'',
-    us_nivel:''      
-});
+    us_idEmpresa:0,
+    us_nivel:'',
+    us_nombre:'',
+    usuarioId:0
+}]);
+
+const AuthContext = createContext();
 
 const [aviso, setAviso] =useState('');
 
@@ -34,23 +39,25 @@ const handledSubmit = async (e) => {
         await axios.post(ruta,{usu:usuarios})
         .then(res=>{        
             var misDatos=res.data[0];
-      
+            setUsuarios(misDatos);
+  
             if(typeof misDatos == "undefined" ){
                 setAviso('Usuario no registrado');  
                 return false
             }
 
-                if (misDatos.us_estado === 'I'){
-                    setAviso('Usuario no está habilitado');
-                }
-                if (md5(usuarios.us_clave) !== misDatos.us_clave){
-                    setAviso('Contraseña inválida');
-                }
+            if (misDatos.us_estado === 'I'){
+                setAviso('usuario no está habilitado');
+            }
+            var clave = md5(usuarios.us_clave);
+            if (clave !== misDatos.us_clave){
+                setAviso('usuario y/o contraseña con error');
+            }
         if(aviso===''){
-            <Menu/>
-           // return true;
+            <UserContext.Provider value={misDatos}>            
+                <Menu />
+            </UserContext.Provider>
         }
-
     })
     }
 }
@@ -64,26 +71,22 @@ const handledSubmit = async (e) => {
 
             <div className="row g-3 align-items-center">
                 <label htmlFor="us_email">Correo electrónico</label>
-                <input type="email" className="form-control" name='us_email' id="us_email" defaultValue={usuarios.us_email}
+                <input type="email" className="form-control" name='us_email' id="us_email" 
                         onChange={handledChange}/> 
             </div>
 
             <div className="row g-3 align-items-center">
                 <label htmlFor="us_clave">Contraseña</label>
-                <input type="password" className="form-control" name='us_clave' id="us_clave" defaultValue={usuarios.us_clave}
+                <input type="password" className="form-control" name='us_clave' id="us_clave" 
                         onChange={handledChange}/>     
             </div>
 
-            <div className="checkbox mb-3">
-            <label>
-                <input type="checkbox" value="remember-me"/> Recordarmelo
-            </label>
-            </div>
+  
             <button className="w-100 btn btn-lg btn-primary" type="submit">Ingreso</button>
-            <div className='form-group'>
+            <div className='form-group alert'>
                 <span>{aviso}</span>
             </div>  
-            <p className="mt-5 mb-3 text-center">&copy; 2022–2023</p>
+            <p className="mt-5 mb-3 text-center">&copy; 2023–2024</p>
         </form>
         </main>
     </div>

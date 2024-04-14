@@ -28,10 +28,10 @@ const getGeneral = async (req,res)  => {
   let tabla = dato[1];  
   let donde = dato[2];
   let orden = dato[3];
-
+///id, grp_nombre, grp_detalle|grupos|grp_estado = 'A' AND grp_idEmpresa = 8| grp_nombre"; 
   let sql = "SELECT " + campos + " FROM " + tabla + " WHERE " + donde
   sql += " ORDER BY " + orden    
-console.log(sql);
+// console.log(sql);
   const [result] = await pool.query(sql)
   return res.status(200).json(result);
 

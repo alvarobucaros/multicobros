@@ -24,6 +24,7 @@ export default async function handler(req, res) {
 
   const getUsers = async (req,res)  => {
     let id  = req.query.id;
+
     let sql = "SELECT id, us_idEmpresa, us_nombre, us_direccion, " 
     sql += " us_localidad, us_barrio, us_ciudad, us_email, us_codigo, " 
     sql += " us_tipoDoc, us_nroDoc, us_telefono, us_clave, us_estado, us_nivel " 

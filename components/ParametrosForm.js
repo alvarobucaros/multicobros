@@ -1,13 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState} from 'react';
-import {Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
+import 'bootstrap/dist/css/bootstrap.css';
 
 function ParametrosForm(props) {
     const empresa = props.e;
     const usuario = props.u;
     const nivel = props.n;
     const [show, setShow]= useState(false)
-
+    const [modalPpal, setModalPpal] = React.useState(false);
     var   [misDatos] = [{}];
 
     const [empresas, setEmpresas] = useState({  
@@ -29,20 +29,18 @@ function ParametrosForm(props) {
         em_saldo:0
     });    
 
-const [startDate, setStartDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(new Date());
 
-useEffect(()=>{
-  traeInfo(empresa)
-},[])
+    useEffect(()=>{
+      traeInfo(empresa)
+    },[])
 
 async function traeInfo(empresa){ 
   await  axios.get('http://localhost:3000/api/empresas/'+empresa)
   .then(res=>{
     misDatos=res.data[0];       
-      for (var i = 0; i < misDatos.length; i++){
-        misDatos[i].em_fchini =  misDatos[i].em_fchini.slice(0, -14)
-        // misDatos[i].em_fchfin =  misDatos[i].em_fchfin.slice(0, -14)    
-    }  
+    misDatos.em_fchini =  misDatos.em_fchini.slice(0, -14)
+    misDatos.em_fchfin =  misDatos.em_fchfin.slice(0, -14)  
     setEmpresas(misDatos) 
   })
 }
@@ -62,7 +60,7 @@ async function ActualizaRegistro () {
   if(empresas.em_telefono===''){err += ', Teléfono';}
   if(empresas.em_email===''){err += ', Email';}
   if (err===''){
-  await  axios.post('http://localhost:3000/api/empresas', empresas)
+  await  axios.put('http://localhost:3000/api/empresas', empresas)
   .then( alert('Información actualizada'),()=>{
   })
   }else{
@@ -70,28 +68,26 @@ async function ActualizaRegistro () {
   }
 }
 
-
-     
   return (
     <div className='container'>
-      <main className="form-signin w-800 m-auto">
+       <main className="form-signin w-800 m-auto">
         <form onSubmit={handledSubmit}>
           <div className="d-flex align-items-sm-center mb0">
-            <label className="col-sm-6 col-form-label" htmlFor="em_nombre">Nombre</label>
-            <input type="text" className="form-control col-sm-10 ancho200" name='em_nombre' id="em_nombre" 
-                defaultValue={empresas.em_nombre} onChange={handledChange}/> 
+              <label className="col-sm-6 col-form-label" htmlFor="em_nombre">Nombre Asociación</label>
+              <input type="text" className="form-control col-sm-10 ancho200" name='em_nombre' id="em_nombre" 
+                  defaultValue={empresas.em_nombre} onChange={handledChange} required="required" />   
           </div>
-<br/>
+
           <div className="d-flex align-items-sm-center mb0">
             <label className="col-sm-6 col-form-label" htmlFor="em_observaciones">Observaciones</label>
             <textarea name="em_observaciones" id="em_observaciones" cols="200" rows="2"                
-           className="form-control col-sm-10 ancho200"  defaultValue={empresas.em_observaciones} onChange={handledChange}/>
+            className="form-control "  defaultValue={empresas.em_observaciones} onChange={handledChange}/>
           </div>
 
  
           <div className="d-flex align-items-sm-center mb0">
             <label className="col-sm-6 col-form-label" htmlFor="em_saldo">Saldo</label>
-            <input type="text" className="form-control col-sm-10 ancho200" name='em_saldo' id="em_saldo" 
+            <input type="text" className="form-control " name='em_saldo' id="em_saldo" 
                 defaultValue={empresas.em_saldo} onChange={handledChange}/> 
           </div>
 

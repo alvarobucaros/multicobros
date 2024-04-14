@@ -2,7 +2,7 @@
 import {pool} from "../../../config/db";
 
 export default async function handler(req, res) {
- console.log(req.method)
+ 
     switch(req.method){
       case 'GET':
         return await getctaXcobrar(req, res);
@@ -24,40 +24,53 @@ export default async function handler(req, res) {
 const getctaXcobrar = async (req,res)  => {
   
 
-  // 'ctaVlr|'+empresa+'|'+cp+'|'+gr;
-  // 'existe+|'+empresa+'|'+cp+'|'+gr;
+  // 'opcion|'+empresa+'|'+cp+'|'+gr;
+
   let arg = req.query.arg;
   let arr = arg.split('|');
   let op = arr[0];
-  
+  let sql = '';
+
   if (op=='existe'){   
     let e=arr[1];
     let cp=arr[2];
-    let gr=arr[3];
-    let sql = '';
+    let gr=arr[3];  
     sql += " SELECT  cc_fechaProceso, sum(cc_valor) suma, sum(cc_saldo) saldo" 
     sql += " FROM cuentascobrar WHERE  cc_activa='A' AND cc_idEmpresa =  " + e
     sql += " AND cc_idConcepto = "+ cp+ " AND cc_idGrupo =  " + gr
     sql += " GROUP BY cc_fechaProceso ORDER BY cc_fechaProceso DESC "   ;
-
     const [result] = await pool.query(sql);
     return res.status(200).json(result);   
-   
-  }else if(op=='todas'){
-    let sql = '';
+  }else 
+  if(op=='todas'){
     sql += " SELECT  id, cc_idEmpresa, cc_idConcepto, cc_idGrupo, cc_fechaProceso,  cc_valor, cc_saldo, cc_activa " 
     sql += " FROM cuentascobrar WHERE  cc_activa='A' AND cc_idEmpresa =  " + e
     sql += " ORDER BY cc_fechaProceso DESC "   ;
     const [result] = await pool.query(sql);
     return res.status(200).json(result);    
-  }  
-  //'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor
-  // 2|17|30|10|2022-07|50000.00
-  // 2|0|56|7|2022-07|90.00
+  } 
+  else 
+  if(op=='traeGrupo'){
+    let e=arr[1];
+    let cp=arr[2];
+    let gr=arr[3]; 
+    sql += "SELECT id, cc_idEmpresa, cc_idConcepto, cc_idGrupo, cc_fechaProceso," 
+    sql += " cc_valor,cc_saldo,cc_activa FROM cuentascobrar " 
+    sql += " WHERE cc_idEmpresa = " + e + " AND cc_idConcepto =  "+ cp + 
+    " AND cc_idGrupo = " + gr;
+    const [result] = await pool.query(sql);
+    return res.status(200).json(result); 
+  } else
+  if(op=='cobros'){
+    sql += "SELECT count(*) as nro FROM cobros WHERE cb_idEmpresa = " + e + 
+    " AND cb_idConcepto = "+ cp + " AND cb_saldo > 0 "
+    const [result] = await pool.query(sql);
+    return res.status(200).json(result); 
+  }
 }
-  
-  // 'crear+|'+empresa+'|'+cp+'|'+gr+'|'+cuota+'|'+fecha+'|'+valor;
-const savectaXcobrar = async (req,res)  => {
+
+
+ const savectaXcobrar = async (req,res)  => {
   let arg = req.query.arg;
   let arr = arg.split('|');
   let op = arr[0];
@@ -69,7 +82,8 @@ const savectaXcobrar = async (req,res)  => {
     sql +=  "FROM conceptos WHERE id="+ cp + " AND cp_idEmpresa = "+e
     const [result] = await pool.query(sql);
     return res.status(200).json(result); 
-  } else if(op == 'crear'){
+  } else 
+  if(op == 'crear'){
     let e=arr[1];
     let cp=arr[2];
     let gr=arr[3];

@@ -24,6 +24,7 @@ function EmpresaForm(props) {
         em_consecEgreso:'',
         em_consecAjustes:'',
         em_fchini:'',
+        em_fchfin:'',
         em_estado:'',
         em_saldo:0
 });
@@ -36,18 +37,14 @@ function EmpresaForm(props) {
     },[])
 
     async function traeInfo(empresa){ 
-        let id = empresa; 
-        
-        await  axios.get('http://localhost:3000/api/empresas/'+id)
+        await  axios.get('http://localhost:3000/api/empresas/'+empresa)
         .then(res=>{
-            misDatos=res.data; 
-        })
-                    
-        for (var i = 0; i < misDatos.length; i++){
-            misDatos[i].em_fchini =  misDatos[i].em_fchini.slice(0, -14)  
-        }  
+          misDatos=res.data[0];   
+          misDatos.em_fchini =  misDatos.em_fchini.slice(0, -14)
+          misDatos.em_fchfin =  misDatos.em_fchfin.slice(0, -14)    
           setEmpresas(misDatos) 
-        }
+        })
+      }
       
 
     const handledChange = ({target: {name, value}}) => {
@@ -61,13 +58,14 @@ function EmpresaForm(props) {
 
     
     async function ActualizaRegistro () { 
-        let err=''      
+        let err='' 
+        alert(empresas.em_fchfin+' '+empresas.em_fchfin)     
         if(empresas.em_nombre===''){err += ', Nombre';}
         if(empresas.em_direccion===''){err += ', Direción';}
         if(empresas.em_telefono===''){err += ', Teléfono';}
         if(empresas.em_email===''){err += ', Email';}
         if (err===''){
-        await  axios.post('http://localhost:3000/api/empresas', empresas)
+        await  axios.put('http://localhost:3000/api/empresas', empresas)
         .then( alert('Información actualizada'),()=>{
         })
         }else{
@@ -129,8 +127,8 @@ function EmpresaForm(props) {
                     defaultValue={empresas.em_ciudad} onChange={handledChange}/> 
             </div> 
             <div className="d-flex align-items-sm-center mb0">
-                <label className="col-sm-6 col-form-label" htmlFor="iniDate">Fecha Inicio</label>
-                <input type="date" className="form-control ancho100" name='iniDate' id="iniDate" 
+                <label className="col-sm-6 col-form-label" htmlFor="em_fchini">Fecha Inicio</label>
+                <input type="date" className="form-control ancho100" name='em_fchini' id="em_fchini" 
                     defaultValue={empresas.em_fchini} /> 
             </div>
   
@@ -145,8 +143,8 @@ function EmpresaForm(props) {
             </div>  
             <div className="checkbox mb-3 mb0">
                 <span  className='alert'>{aviso}</span>
-          <button className='btn btn-outline-primary btn-sm' onClick={ActualizaRegistro}>Actualiza</button>
-                {/* <Button className='btn btn-outline-primary btn-sm' onClick={ActualizaRegistro}>Actualiza</Button>                */}
+                <button className='btn btn-outline-primary btn-sm' 
+                onClick={ActualizaRegistro}>Actualiza</button>
             </div>
 
 {show ?  
@@ -156,6 +154,7 @@ function EmpresaForm(props) {
 <input type="text" name='em_consecRcaja' id="em_consecRcaja" defaultValue={empresas.em_consecRcaja} /> 
 <input type="text" name='em_consecEgreso' id="em_consecEgreso" defaultValue={empresas.em_consecEgreso} /> 
 <input type="text" name='em_consecAjustes' id="em_consecAjustes" defaultValue={empresas.em_consecAjustes} /> 
+<input type="text" name='em_fchfin' id="em_fchfin" defaultValue={empresas.em_fchfin} /> 
 </div>       
 :''}
           

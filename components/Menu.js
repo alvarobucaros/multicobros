@@ -8,20 +8,24 @@ function Menu(props) {
     const nomEmpresa = " MI EMPRESA COLOMBIANA DE PRUEBAS ";
     const nomUsuario = "Alvaro Ortiz";
     const nomTipo = "Consultas";
-    const empresa = 2;
+    const empresa = 1;
     const usuario = 1;
     const nivel = 'A';
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
     const [aviso, setAviso] =useState('');
-    const [usuarios, setUsuarios] = useState({  
-        id:usuario,
-        us_idEmpresa:empresa,
+    const [usuarios, setUsuarios] = useState([{  
+        em_nombre:'',   
+        empreasId:0,
         us_clave:'',
-        us_nueva_clave:'',
-        us_repite_clave:'',      
-    });
+        us_email:'',
+        us_estado:'',
+        us_idEmpresa:0,
+        us_nivel:'',
+        us_nombre:'',
+        usuarioId:0
+    }]);
   
     
     const handleClick = (e) => {

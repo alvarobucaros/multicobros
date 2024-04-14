@@ -121,13 +121,14 @@ async function traeGrupos(id)
   const Continua = () => {
     setModalDel(false);
     ActualizaCobros()
-  }
+  } 
 
   async function  ActualizaCobros() {
     setSwtLoad(true);
     let cp =  setCtaXcobrar.cc_idConcepto;
     let gr = setCtaXcobrar.cc_idGrupo 
     let arg = "ctaVlr|"+empresa+"|"+cp+"|"+gr;
+    alert(arg);
     let url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;   
     await  axios.post(url)
     .then(res=>{
@@ -195,10 +196,33 @@ async function traeGrupos(id)
       setListo(true);
     }
 
-    const handleSelectChangeGrpo = (e) =>{
+    async function handleSelectChangeGrpo(e){
       let id = e.target.value;
       setCtaXcobrar.cc_idGrupo = id;
       setSwtProcesa(true)
+      let cp = setCtaXcobrar.cc_idConcepto;
+
+      let arg = "traeGrupo|"+empresa+"|"+cp+"|"+id;
+   //  alert(arg);
+      let url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;   
+      await  axios.get(url)
+      .then(res=>{
+        misDatos=res.data; 
+      })
+      let msg='';
+    if( misDatos.length !== 0)  {
+      if(misDatos.cc_activa === 'A'){
+        let arg = "cobros|"+empresa+"|"+cp+"|"+id;
+        let url = 'http://localhost:3000/api/cuentasXcobrar?arg='+arg;   
+        await  axios.get(url)
+        .then(res=>{
+          misDatos=res.data; 
+          msg="Este concepto para este grupo tiene aún " + misDatos.nro;
+          msg += " Registros sin pago"
+          alert(msg)
+        })
+      }
+    }
     }
 
     const procesar = () => {

@@ -10,7 +10,7 @@ function ConceptosForm(props) {
     const [pagina, setPagina] = useState(0);
     const [registros, setRegistros] = useState([{}]);
     const registrosPorPagina = 6;
-
+    const [showDiv, setShowDiv] = useState(true);
     const empresa = props.e;
     const usuario = props.u;
     const nivel = props.n
@@ -22,18 +22,20 @@ function ConceptosForm(props) {
         cp_descripcion:'', 
         cp_fechaDesde:'', 
         cp_fechaHasta:'', 
-        cp_valorCobro:0, 
-        cp_cuotas:0, 
+        cp_valorCobro:'', 
+        cp_cuotas:'', 
         cp_valorCuota:0, 
         cp_estado:'A', 
-        cp_aplica:'T' 
+        cp_aplica:'T' ,
+        cp_procentaje: 0,
+        cp_tipo:''
     })
 
     const [conceptosW, setConceptosW]  = useState({  
         id:0, cp_idEmpresa:empresa, cp_titulo:'', cp_descripcion:'',
-        cp_fechaDesde:'', cp_fechaHasta:'', cp_valorCobro:0, cp_cuotas:0,
-        cp_valorCuota:0, cp_estado:'A', cp_aplica:'T' 
-
+        cp_fechaDesde:'', cp_fechaHasta:'', cp_valorCobro:'', cp_cuotas:'',
+        cp_valorCuota:0, cp_estado:'A', cp_aplica:'T',  cp_procentaje: 0,
+        cp_tipo:''
     })
   
     const [aviso, setAviso] = useState('');
@@ -68,8 +70,7 @@ function ConceptosForm(props) {
        
     }   
     //  Paginación
-    async function subPartirTabla(pagina){   
-            
+    async function subPartirTabla(pagina){              
             var ini = pagina * registrosPorPagina;
             var fin = ini + registrosPorPagina;
             var tempData = []
@@ -105,8 +106,6 @@ function ConceptosForm(props) {
    setPagina(pg);
    await subPartirTabla(pg);
       }
-
-
       function handleShow(rec){
         setDetBorrado(rec.cp_titulo + ' - ' + rec.cp_descripcion);
         setCodBorrado(rec.id)
@@ -121,22 +120,26 @@ function ConceptosForm(props) {
     async function ActualizaRegistro () { 
         let err=''
         setAviso(err);
-        conceptos.cp_idEmpresa=empresa;      
+        conceptos.cp_idEmpresa=empresa;    
         if(conceptos.cp_titulo===''){err += 'Falta Título';}
         if(conceptos.cp_descripcion===''){err += ', Falta Descripción';}
-        if(conceptos.cp_valorCobro===''){err += ',Falta Valor Cobro';}
-        if(conceptos.cp_valorCobro ==0){err += ', Cobro debe ser mayor a cero';}
-        if(conceptos.cp_valorCuota===''){err += ', Valor Cuota';}
-        if(conceptos.cp_cuotas===0 ){err += ',Falta nro cuotas';} 
+        if(conceptos.cp_tipo==='C')
+        {
+            if(conceptos.cp_valorCobro===''){err += ',Falta Valor Cobro';}
+            if(conceptos.cp_valorCobro ==0){err += ', Cobro debe ser mayor a cero';}
+            if(conceptos.cp_valorCuota===''){err += ', Valor Cuota';}
+            if(conceptos.cp_cuotas===0 ){err += ',Falta nro cuotas';} 
         
-        if(conceptos.cp_cuotas > 0){
-            let tmp = conceptos.cp_valorCuota / conceptos.cp_cuotas ;
-            if (tmp != conceptos.cp_valorCuota ){
-                err += ', El valor Deuda no es igual a cuotas * valor cuota';
+            if(conceptos.cp_cuotas > 0){
+                let tmp = conceptos.cp_valorCuota * conceptos.cp_cuotas ;
+                if (tmp != conceptos.cp_valorCobro ){
+                    err += ', El valor Deuda no es igual a cuotas * valor cuota';
+                }               
+            }
+            if(conceptos.cp_fechaDesde > conceptos.cp_fechaHasta){
+                err += ', Fecha final mayor a la de inicio ';
             }
         }
-        
-        if(conceptos.cp_fechaDesde > conceptos.cp_fechaHasta){err += ', Fecha final mayor a la de inicio ';}
         if (err===''){
         await  axios.post('http://localhost:3000/api/conceptos', conceptos)
         .then( alert('Información actualizada'),()=>{
@@ -146,6 +149,7 @@ function ConceptosForm(props) {
         }else{
             setAviso('Nota: '+err);
         }
+        
     }
     
     async function BorraRegistro(){  
@@ -164,21 +168,32 @@ function ConceptosForm(props) {
   
     const handledChange = ({target: {name, value}}) => {
         setConceptos({...conceptos, [name]: value});
+        if(name === 'cp_tipo' && value === 'C'){
+            setShowDiv(true)}
+        else{
+            setShowDiv(false)}
     }
 
     const calculaCuota = () => {
-        conceptos.cp_valorCuota = 0;
-        if (conceptos.cp_cuotas > 0){
-        setConceptos.cp_valorCuota = conceptos.cp_valorCobro / conceptos.cp_cuotas;
+        var cp_valorCuota = 0;
+        var cp_cuotas = document.getElementById('cp_cuotas').value;
+        var cp_valorCobro = document.getElementById('cp_valorCobro').value;
+       
+        if (cp_cuotas > 0){
+            cp_valorCuota = cp_valorCobro / cp_cuotas;
+            setConceptos({ ...conceptos, cp_valorCuota : cp_valorCuota }); // propagación
+            //setConceptos(conceptos.cp_valorCobro);
+            document.getElementById('cp_valorCuota').value = cp_valorCuota;
         }
     }
     return (
     <div>
         <div>
-            <table   className='miTable'>
+            <table className='miTable'>
                 <thead>  
                     <tr key={0}>
-                        <th className="">Titulo</th>                            
+                        <th className="">Tipo</th>    
+                        <th className="">Titulo</th>                           
                         <th className="">Detalle</th>
                         <th className="">Fecha Desde</th>
                         <th className="">Fecha Hasta</th>
@@ -194,6 +209,7 @@ function ConceptosForm(props) {
                 
                 {registros.map((rec, key) =>                
                     <tr key={rec.id}>
+                        <td className="trc">{rec.cp_tipo}</td>
                         <td className="trc">{rec.cp_titulo}</td>
                         <td className="trl">{rec.cp_descripcion}</td>
                         <td className="trc">{rec.cp_fechaDesde}</td>
@@ -241,17 +257,38 @@ function ConceptosForm(props) {
                         <div className='container'>
                             <form onSubmit={handledSubmit}>
                                 <div className="mb-1 row">
+                                    <label className="col-sm-3 col-form-label" htmlFor="us_nivel">Tipo</label>
+                                    <div className="col-sm-9">
+                                        <input type="radio" value="C" name='cp_tipo'
+                                        defaultValue={conceptos.cp_tipo} onChange={handledChange}
+                                        checked={conceptos.cp_tipo === "C"}/> Cobros {'   '}
+                                        <input type="radio" value="I" name='cp_tipo'
+                                        defaultValue={conceptos.cp_tipo} onChange={handledChange}
+                                        checked={conceptos.cp_tipo === "I"}/> Ingreso{'   '}
+                                        <input type="radio" value="G" name='cp_tipo'
+                                        defaultValue={conceptos.cp_tipo} onChange={handledChange}
+                                        checked={conceptos.cp_tipo === "G"}/> Gasto{'   '}
+                                        <input type="radio" value="A" name='cp_tipo'
+                                        defaultValue={conceptos.cp_tipo} onChange={handledChange}
+                                        checked={conceptos.cp_tipo === "A"}/> Ajuste
+                                    </div>
+                                </div>                           
+                                {showDiv ? (
+                                    <div>
+                                        
+                                   
+                                <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_titulo">Título</label>
                                     <div className="col-sm-9">
                                     <input type="text" className="form-control" name='cp_titulo' id="cp_titulo" 
-                                        defaultValue={conceptos.cp_titulo} onChange={handledChange} /> 
+                                        defaultValue={conceptos.cp_titulo} onChange={handledChange} required /> 
                                     </div>
                                 </div>
                                 <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_descripcion">Detalle</label>
                                     <div className="col-sm-9">
                                         <textarea className="form-control" name='cp_descripcion' id="cp_descripcion" 
-                                        defaultValue={conceptos.cp_descripcion} onChange={handledChange}
+                                        defaultValue={conceptos.cp_descripcion} onChange={handledChange} required
                                         rows={3} cols={50}/>
                                     </div>
                                 </div>                            
@@ -259,37 +296,36 @@ function ConceptosForm(props) {
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_valorCobro">Valor Cobro</label>
                                     <div className="col-sm-9">
                                         <input type="text" className="form-control trr" name='cp_valorCobro' id="cp_valorCobro" 
-                                        defaultValue={conceptos.cp_valorCobro} onChange={handledChange}/> 
+                                        defaultValue={conceptos.cp_valorCobro} onChange={handledChange} required/> 
                                     </div>
-                                </div>
-                                
+                                </div>                                
                                 <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_cuotas">Nr Cuotas</label>
                                     <div className="col-sm-9">
                                         <input type="text" className="form-control trr" name='cp_cuotas' id="cp_cuotas" 
                                         defaultValue={conceptos.cp_cuotas} onChange={handledChange}
-                                       /> 
+                                        onBlur={calculaCuota} required /> 
                                     </div>
                                 </div>                                
                                 <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_valorCuota">Valor Cuota</label>
                                     <div className="col-sm-9">
                                         <input type="text" className="form-control trr" name='cp_valorCuota' id="cp_valorCuota" 
-                                        defaultValue={conceptos.cp_valorCuota} onChange={handledChange}/> 
+                                        defaultValue={conceptos.cp_valorCuota} onChange={handledChange} readOnly={true}/> 
                                     </div>
                                 </div>
                                 <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_fechaDesde">Fecha Inicio</label>
                                     <div className="col-sm-9">
                                     <input type="date" className="form-control trl" name='cp_fechaDesde' id="cp_fechaDesde" 
-                                        defaultValue={conceptos.cp_fechaDesde} onChange={handledChange}/> 
+                                        defaultValue={conceptos.cp_fechaDesde} onChange={handledChange} required/> 
                                     </div>
                                 </div>
                                 <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="cp_fechaHasta">Fecha Final</label>
                                     <div className="col-sm-9">
                                     <input type="date" className="form-control trl" name='cp_fechaHasta' id="cp_fechaHasta" 
-                                        defaultValue={conceptos.cp_fechaHasta} onChange={handledChange}/> 
+                                        defaultValue={conceptos.cp_fechaHasta} onChange={handledChange} required/> 
                                     </div>
                                 </div>
                                 <div className="mb-1 row">
@@ -314,6 +350,45 @@ function ConceptosForm(props) {
                                         checked={conceptos.cp_estado === "I"}/> Inactivo
                                     </div>
                                 </div>   
+                                </div>
+                            
+
+                                ) : (
+                                    <div>                     
+                 
+                                      <div className="mb-1 row">
+                                        <label className="col-sm-3 col-form-label" htmlFor="cp_titulo">Título</label>
+                                        <div className="col-sm-9">
+                                        <input type="text" className="form-control" name='cp_titulo' id="cp_titulo" 
+                                            defaultValue={conceptos.cp_titulo} onChange={handledChange} required /> 
+                                        </div>
+                                        </div>
+                                        <div className="mb-1 row">
+                                            <label className="col-sm-3 col-form-label" htmlFor="cp_descripcion">Detalle</label>
+                                            <div className="col-sm-9">
+                                                <textarea className="form-control" name='cp_descripcion' id="cp_descripcion" 
+                                                defaultValue={conceptos.cp_descripcion} onChange={handledChange} required
+                                                rows={2} cols={50}/>
+                                            </div>
+                                        </div> 
+                                        <div className="mb-1 row">
+                                    <label className="col-sm-3 col-form-label" htmlFor="cp_valorCobr">Valor</label>
+                                    <div className="col-sm-9">
+                                        <input type="text" className="form-control trr" name='cp_valorCobr' id="cp_valorCobr" 
+                                        defaultValue={conceptos.cp_valorCobr} onChange={handledChange} /> 
+                                    </div>
+                                </div>
+                                <div className="mb-1 row">
+                                    <label className="col-sm-3 col-form-label" htmlFor="cp_procentaje">Porcentaje</label>
+                                    <div className="col-sm-9">
+                                        <input type="text" className="form-control trr" name='cp_procentaje' id="cp_procentaje" 
+                                        defaultValue={conceptos.cp_procentaje} onChange={handledChange} /> 
+                                    </div>
+                                </div>                                        
+                                  </div>  
+                                )}
+
+
                                 <span  className='alert'>{aviso}</span>                                                                                                            
                             </form>
                           

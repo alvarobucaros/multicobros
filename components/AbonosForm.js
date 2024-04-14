@@ -91,7 +91,8 @@ function AbonosForm(props) {
     },[])
 
     async function traeComboPpal(empresa){ 
-      const ruta = "http://localhost:3000/api/usuarios?e="+empresa+"&op=abono";
+      let arg = "abono|"+empresa+"||";
+      const ruta = "http://localhost:3000/api/usuarios?arg="+arg;
       const res = await axios.get(ruta)
       .then(res=>{
           misDatos=res.data;               
@@ -248,7 +249,7 @@ function AbonosForm(props) {
       return (
         <div className=''>
           <main className="w-800 ml-10">
-          <form onSubmit={handledSubmit}>
+          <form  onSubmit={handledSubmit}>
             <div className="div_select">
                 <label className="col-sm-2 col-form-label" htmlFor="us_nombre">Deudor:</label>
                 <div className="col-sm-10">            

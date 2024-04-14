@@ -27,7 +27,7 @@ export default async function handler(req, res) {
         sql += " em_autentica, em_consecRcaja, em_consecEgreso, em_consecAjustes,  ";
         sql += "em_fchini, em_estado, em_saldo ";
         sql += " FROM empresas  WHERE id = ?"  
-    
+
         const [result] = await pool.query(sql,id);
         return res.status(200).json(result);
       }
@@ -36,6 +36,27 @@ export default async function handler(req, res) {
         const {id} = req.body;
         const [result] = await pool.query("DELETE FROM Empresas WHERE id = ?",{id})
         return res.status(200).json(result);
+      }
+      
+      const updateEmpresas = async (req, res) => {
+        const {id, em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,
+               em_email, em_observaciones, em_autentica, em_consecAjustes,
+               em_consecRcaja, em_consecEgreso, em_fchini, em_fchfin,
+               em_estado, em_saldo} = req.body;
+      var x = 'INDEX ' + em_consecAjustes+ ' ' +
+      em_consecRcaja+ ' ' + em_consecEgreso+ ' ' + em_fchini+ ' ' + em_fchfin+ ' ' +
+      em_estado+ ' ' + em_saldo;
+      console.log(x)
+        const [result] = await pool.query("UPDATE Empresas SET ? WHERE id = "+id,
+        {em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,
+          em_email, em_observaciones, em_autentica, em_consecAjustes,
+          em_consecRcaja,em_consecEgreso, em_fchini, em_fchfin,
+          em_estado, em_saldo})
+        return res.status(200).json({em_nombre,em_direccion,em_ciudad,em_tipodoc,em_nrodoc,em_telefono,
+          em_email, em_observaciones, em_autentica, em_consecAjustes,
+          em_consecRcaja,em_consecEgreso, em_fchini, em_fchfin,
+          em_estado, em_saldo, 
+            id: result.insertId }); 
       }
       
     const saveEmpresas = async (req, res) => {

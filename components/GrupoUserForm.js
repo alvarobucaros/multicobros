@@ -8,10 +8,10 @@ function GruposForm(props) {
     const usuario = props.u;
     const nivel = props.n;
 
-    const [grupoEscogido, setGrupoEscogido] = useState(0);
+    //const [grupoEscogido, setGrupoEscogido] = useState(0);
     const [opcion, setOpcion] = useState(false)
     const [aviso, setAviso] =useState('');
-
+    const[grupoEscogido, setGrupoEscogido] =useState(0);
     var   [misDatos] = [{}];
 
     const [grupos, setGrupos]  = useState({  
@@ -36,12 +36,11 @@ function GruposForm(props) {
 
     useEffect(()=>{
       traeComboPpal(empresa)
-      traeInfoUsuarios(empresa)
     },[])
 
     async function traeComboPpal(empresa){ 
-      let id =  "id, grp_nombre, grp_detalle|grupos|";
-      id += "grp_estado = 'A' AND grp_idEmpresa = "  +empresa + "| grp_nombre";    
+      let id =  "id, grp_nombre, grp_detalle|grupos| ";
+      id += "grp_estado = 'A' AND grp_idEmpresa = " +empresa + "| grp_nombre";    
       await  axios.get('http://localhost:3000/api/generales/'+id)
       .then(res=>{
           misDatos=res.data;               
@@ -57,8 +56,9 @@ function GruposForm(props) {
       })
     }
 
-      async function traeInfoUsuarios(empresa){ 
-        await  axios.get("http://localhost:3000/api/usuarios?e="+empresa)
+      async function traeInfoUsuarios(datos){ 
+        var id=datos+'|grupo';
+        await  axios.get("http://localhost:3000/api/usuarios?id="+id)
         .then(res=>{
           setGrpUsuario(res.data) 
           setOpcion(true)
@@ -66,18 +66,18 @@ function GruposForm(props) {
       }
 
       async function  ActualizaRegistro (e) {
-        e.preventDefault();
-       
+        e.preventDefault();       
         let si = ''
-        let nota = ''
+      //  let nota = ''
         for (let index = 0; index < grpUsuario.length; index++) {
-          nota += '{ '+grpUsuario[index].estado+' '+ grpUsuario[index].us_nombre+ '} ';
+      //    nota += '{ '+grpUsuario[index].estado+' '+ grpUsuario[index].us_nombre+ '} ';
           if (grpUsuario[index].estado===1){
             si +=grpUsuario[index].usuario +','
             }
         }
         si +='0';
-       
+      
+       alert(si);
         await  axios.post('http://localhost:3000/api/grupos/grupoUser?e='+empresa+'&si='+si+'&gr='+grupoEscogido)
         .then( alert('Información actualizada'),()=>{
         })
@@ -93,10 +93,10 @@ function GruposForm(props) {
         llave.empresa  = empresa;
         llave.grupo= id
         setGrupoEscogido(id)
-        traeInfoUsuarios(llave)
+        traeInfoUsuarios(llave.empresa+'|'+llave.grupo)
     }
+    
     const handleChangeEstado = (grp) => {
-
       if (grp.estado === 1) {grp.estado = 0} else {grp.estado = 1}
     }
 

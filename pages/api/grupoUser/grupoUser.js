@@ -37,7 +37,7 @@ const getGruposUsuario = async (req,res)  => {
     let si  = req.query.si; 
     let gr   = req.query.gr; 
     let arr = si.split(',');
-
+ 
     let sel = ''
     for (let index = 0; index < arr.length; index++) {
       if(arr[index] > 0){
@@ -46,11 +46,11 @@ const getGruposUsuario = async (req,res)  => {
       if(index < arr.length-1){sel += ','}
     }
 
-    let sql = " DELETE FROM grupousuarios WHERE id  > 0 AND gu_idGrupo = "
+    let sql = " DELETE FROM grupousuario WHERE id  > 0 AND gu_idGrupo = "
     sql += gr + " AND gu_idEmpresa = " + e
   
     const [result] = await pool.query(sql);
-    sql = " INSERT INTO grupousuarios(gu_idEmpresa, gu_idUsuario, gu_idGrupo) VALUES "
+    sql = " INSERT INTO grupousuario(gu_idEmpresa, gu_idUsuario, gu_idGrupo) VALUES "
     sql +=  sel.slice(0, -1)+";"
   
     const [result1] = await pool.query(sql);

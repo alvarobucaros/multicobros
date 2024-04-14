@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'; 
 import React, { useEffect, useState} from 'react';
 import { Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
 import md5 from 'js-md5'
@@ -187,7 +187,7 @@ function UsuariosForm(props) {
                         <td className="trl">{rec.us_direccion}</td>
                         <td className="trc">{rec.us_ciudad}</td>
                         <td className="trc">{rec.us_email}</td>
-                        <td className="trr">{rec.us_tipoDoc}</td>
+                        <td className="trc">{rec.us_tipoDoc}</td>
                         <td className="trr">{rec.us_nroDoc}</td>
                         <td className="trc">{rec.us_telefono}</td>
                         <td className="trc">{rec.us_codigo}</td>
@@ -231,6 +231,7 @@ function UsuariosForm(props) {
                         <ModalBody>
                         <div className='container'>
                             <form onSubmit={handledSubmit}>
+                                
                                 <div className="mb-1 row">
                                     <label className="col-sm-3 col-form-label" htmlFor="us_nombre">Nombre</label>
                                     <div className="col-sm-9">
@@ -262,7 +263,7 @@ function UsuariosForm(props) {
                                     </div>
                                 </div>
                                 <div className="mb-1 row">
-                                    <label className="col-sm-3 col-form-label" htmlFor="us_telefono">us_telefono</label>
+                                    <label className="col-sm-3 col-form-label" htmlFor="us_telefono">Teléfono</label>
                                     <div className="col-sm-9">
                                         <input type="text" className="form-control" name='us_telefono' id="us_telefono" 
                                         defaultValue={usuarios.us_telefono} onChange={handledChange} required/> 

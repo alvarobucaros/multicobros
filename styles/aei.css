@@ -183,6 +183,10 @@ th {
   padding: auto;
   margin-top:1px;
 }
+.mb1{
+  height:25px;
+  margin-bottom: 2px;
+}
 .alert{
   color: rgb(232, 51, 38);
 }
@@ -211,6 +215,13 @@ th {
   color: #06c;
 }
 .strong{
+  font-weight: bold;
+  color: #06c;
+}
+.avisoAnticipo{
+  margin-left: 10%;
+  margin-top: 10px;
+  margin-bottom: 10px;
   font-weight: bold;
   color: #06c;
 }

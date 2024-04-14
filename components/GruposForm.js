@@ -1,34 +1,34 @@
 import axios from 'axios';
 import React, { useEffect, useState} from 'react';
-import {Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
-import DatePicker from "react-datepicker";
+import { Button, Modal, ModalFooter, ModalHeader, ModalBody} from "reactstrap"
 import "react-datepicker/dist/react-datepicker.css";
+import 'bootstrap/dist/css/bootstrap.css';
 
 function GruposForm(props) {
-    const empresa = props.e;
-    const usuario = props.u;
-    const nivel = props.n;
-
+  
     var   [misDatos] = [{}];
     const [registros, setRegistros] = useState([{}]);
     const [numeroPaginas, setNumeroPaginas] = useState(0);
     const registrosPorPagina = 6;
     var   totalRegistros = 0;
     const [pagina, setPagina] = useState(0);
-
     const [aviso, setAviso] =useState('');
+
+    const empresa = props.e;
+    const usuario = props.u;
+    const nivel = props.n;
 
     const [grupos, setGrupos]  = useState({  
       id:0, 
-      grp_empresa:'', 
+      grp_idEmpresa:'', 
       grp_nombre:'', 
       grp_detalle:'', 
       grp_estado:'A'
   })
 
-// SELECT id, grp_empresa, grp_nombre, grp_detalle, grp_estado  FROM grupos
+// SELECT id, grp_idEmpresa, grp_nombre, grp_detalle, grp_estado  FROM grupos
   const [gruposW, setGruposW]  = useState({  
-      id:0, grp_empresa:empresa, grp_nombre:'', grp_detalle:'', grp_estado:'A'})
+      id:0, grp_idEmpresa:empresa, grp_nombre:'', grp_detalle:'', grp_estado:'A'})
 
   const [modalDel, setModalDel] = React.useState(false);
   const toggle_del = () => setModalDel(!modalDel);
@@ -38,37 +38,36 @@ function GruposForm(props) {
   const [codBorrado, setCodBorrado] = useState('');
   const [detBorrado, setDetBorrado] = useState('');
   
-    useEffect(()=>{
-        traeInfo(empresa)
-      },[])
+  useEffect(()=>{
+      traeInfo(empresa)
+    },[])
       
-      async function traeInfo(empresa){ 
-        let id = empresa;       
-        await  axios.get('http://localhost:3000/api/grupos/'+id)
-        .then(res=>{
-            misDatos=res.data; 
-            setRegistros(misDatos)
-            totalRegistros = misDatos.length;
-            setNumeroPaginas( Math.ceil(totalRegistros / registrosPorPagina));
-            var libros =  subTablaPartir(pagina);
-            setRegistros(libros)
-        })
-      }
+    async function traeInfo(empresa){ 
+      let id = empresa;       
+      await  axios.get('http://localhost:3000/api/grupos/'+id)
+      .then(res=>{
+          misDatos=res.data; 
+          setRegistros(misDatos)
+          totalRegistros = misDatos.length;
+          setNumeroPaginas( Math.ceil(totalRegistros / registrosPorPagina));
+          var libros =  subTablaPartir(pagina);
+          setRegistros(libros)
+      })
+    }
 
-         //  Paginación
-    function subTablaPartir(pagina){       
-      var ini = pagina * registrosPorPagina;
-      var fin = (ini + registrosPorPagina) ;
-      var xdatos = [{}]
-      let j=0;
-      if(fin > totalRegistros) {fin = totalRegistros}
-       for (var i = ini; i < fin; i++){
-          xdatos[j] = misDatos[i];
-          j+=1;
-      }
-      return xdatos; //misDatos;
+  //  Paginación
+  function subTablaPartir(pagina){       
+    var ini = pagina * registrosPorPagina;
+    var fin = (ini + registrosPorPagina) ;
+    var xdatos = [{}]
+    let j=0;
+    if(fin > totalRegistros) {fin = totalRegistros}
+      for (var i = ini; i < fin; i++){
+        xdatos[j] = misDatos[i];
+        j+=1;
+    }
+    return xdatos; 
   }
-
 
 async function paginar(op){
   // 0 primera, 9 ultima, 1 siguiente, 2 anterior, 0 ninguna
@@ -99,19 +98,6 @@ async function paginar(op){
   setRegistros(libros, [])
 }
 
-     // Fecha de ISO a amd
-async function fecha(fch){
-  var fecha = Date('MM/dd/YYY')
- 
-   if (fch != null && fch !== undefined) {
-      fecha = fch.toLocaleDateString("en-US")  // m/d/a
-      fch = fecha.split('/')
-      fch = fch[2]+'/'+fch[0]+'/'+fch[1]
-  }else{
-      fch=new Date();
-  }
- return fch;
-}
 function handleShow(rec){
   setDetBorrado(rec.grp_nombre + ' - ' + rec.grp_detalle);
   setCodBorrado(rec.id)
@@ -125,7 +111,7 @@ async function handleShowPpal(rec){
 
 async function ActualizaRegistro () { 
   let err=''
-  grupos.grp_empresa=empresa;
+  grupos.grp_idEmpresa=empresa;
   if(grupos.grp_nombre===''){err += ', Nombre';}
   if(grupos.grp_detalle===''){err += ', Detalle';}
    if (err===''){
@@ -213,7 +199,6 @@ return (
                   </ModalBody>
               </Modal>
           </div>
-
           <div className='modal1'>    
               <Modal isOpen={modalPpal} toggle_ppal={toggle_ppal}>
               <ModalHeader  toggle_ppal={toggle_ppal}>Actualiza información</ModalHeader>

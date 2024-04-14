@@ -1,6 +1,4 @@
 import React from 'react'
-import Foot from '../components/footer'
-import Menu from '../components/Menu'
 import MiEmpresaForm from '../components/MiEmpresaForm'
 import { useRouter } from 'next/router'
 
@@ -13,7 +11,7 @@ export default function cobros() {
 
   return (
     <div className='mi-empresa'>
-      <h3 className='item-body'>CREA UNA EMPRESA</h3>
+      {/* <h3 className='item-body'>CREA UNA EMPRESA</h3> */}
         <div className="">
          <MiEmpresaForm/> 
         </div>

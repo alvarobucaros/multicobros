@@ -24,9 +24,10 @@ export default async function handler(req, res) {
     const getConceptos = async (req,res)  => {
         let id  = req.query.id;
         let sql = "SELECT id, cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, ";
-        sql += "cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica ";
+        sql += "cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, ";
+        sql += "cp_aplica, cp_procentaje, cp_tipo ";
         sql += " FROM conceptos WHERE cp_idEmpresa = ?" 
-        sql += " ORDER BY cp_titulo "
+        sql += " ORDER BY cp_tipo, cp_titulo "
         const [result] = await pool.query(sql,id);
         return res.status(200).json(result);
       }
@@ -35,7 +36,7 @@ export default async function handler(req, res) {
         let id  = req.query.id;
         let sql = "SELECT id, cp_idEmpresa, cp_titulo, cp_descripcion, cp_fechaDesde, ";
         sql += "cp_fechaHasta, cp_valorCobro,  cp_cuotas, cp_valorCuota, cp_estado, cp_aplica ";
-        sql += " FROM conceptos WHERE cp_estado='A' AND cp_idEmpresa = ?" 
+        sql += " FROM conceptos WHERE cp_estado='A' AND cp_tipo = 'C' AND cp_idEmpresa = ?" 
         sql += " ORDER BY cp_titulo "
         const [result] = await pool.query(sql,id);
         return res.status(200).json(result);     

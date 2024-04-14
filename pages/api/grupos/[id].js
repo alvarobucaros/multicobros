@@ -40,7 +40,9 @@ export default async function handler(req, res) {
       }
   
       const deleteGrupos = async (req, res)  => {
-    
+        const {id} = req.body;
+        const [result] = await pool.query("DELETE FROM Grupos WHERE id = ?",{id})
+        return res.status(200).json(result);
       }
       
       const saveGrupos = async (req, res) => {
@@ -48,7 +50,7 @@ export default async function handler(req, res) {
         const sql = "INSERT INTO Grupos SET ?"
         const [result] = await pool.query(sql, 
         {grp_idEmpresa, grp_nombre, grp_detalle, grp_estado})
-
+console.log(sql);
         return res.status(200).json({grp_idEmpresa, grp_nombre, grp_detalle, grp_estado, 
             id: result.insertId });  
       }
